@@ -65,8 +65,8 @@ class FindCharucoState(EventState):
 		trans.rotation.z = base_rot_tool[2]
 		trans.rotation.w = base_rot_tool[3]
 		self.base_h_tool.transforms.append(trans)
-		print(self.base_h_tool.transforms)
-		print("============================")
+		# print(self.base_h_tool.transforms)
+		# print("============================")
 
 
 		if userdata.result_compute:

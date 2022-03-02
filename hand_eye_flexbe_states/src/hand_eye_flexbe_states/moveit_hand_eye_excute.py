@@ -21,7 +21,7 @@ Created on 15.06.2015
 @author: Philipp Schillinger
 '''
 
-class TrajectoryExecuteState(EventState):
+class MoveitHandEyeExecuteState(EventState):
 	'''
 	Move robot by planned trajectory.
 
@@ -35,17 +35,24 @@ class TrajectoryExecuteState(EventState):
 	'''
 
 
-	def __init__(self, group_name):
+	def __init__(self, group_name,reference_frame):
 		'''
 		Constructor
 		'''
-		super(TrajectoryExecuteState, self).__init__(outcomes=['done', 'failed', 'collision'],
-											input_keys=['joint_trajectory', 'target_joints'],
-											output_keys=['joint_config'])
+		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['done', 'failed', 'collision'],
+											#input_keys=['joint_trajectory', 'target_joints'],
+											#output_keys=['joint_config'])
 		# group_name = ""
 		self._group_name = group_name
+		self._reference_frame = reference_fram
 		self._move_group = moveit_commander.MoveGroupCommander(self._group_name)
 		self._result = MoveItErrorCodes.FAILURE
+		self._reference_frame = 'base'
+		self._move_group.set_pose_reference_frame(self._reference_frame)
+		self._end_effector_link = self._move_group.get_end_effector_link()
+		self._move_group.set_end_effector_link(self._end_effector_link)
+		self._move_group.set_max_acceleration_scaling_factor(0.1)
+		self._move_group.set_max_velocity_scaling_factor(0.1)
 
 	def stop(self):
 		pass
@@ -72,6 +79,7 @@ class TrajectoryExecuteState(EventState):
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
+		# self._result = self._move_group.execute(userdata.joint_trajectory)
 		self._result = self._move_group.execute(userdata.joint_trajectory)
 
 	def on_stop(self):
