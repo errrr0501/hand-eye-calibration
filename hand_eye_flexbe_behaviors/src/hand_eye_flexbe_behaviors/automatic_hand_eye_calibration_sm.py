@@ -35,13 +35,13 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 		# parameters of this behavior
 		self.add_parameter('eye_in_hand', False)
-		self.add_parameter('calib_pose_num', 10)
+		self.add_parameter('calib_pose_num', 0)
 		self.add_parameter('base_link', '/base')
 		self.add_parameter('tip_link', '/tool0_controller')
 		self.add_parameter('calibration_file_name', 'hand_eye_calibration.ini')
-		self.add_parameter('move_distance', 5)
-		self.add_parameter('times', 1)
-		self.add_parameter('reference_frame', 'base')
+		self.add_parameter('move_distance', 10)
+		self.add_parameter('times', 10)
+		self.add_parameter('reference_frame', 'base_link')
 		self.add_parameter('group_name', 'manipulator')
 
 		# references to used behaviors
@@ -68,7 +68,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		with _state_machine:
 			# x:133 y:27
 			OperatableStateMachine.add('Move_Robot_Manually',
-										MoveRobotManuallyState(wait_time=self.wait_time, pose_num=self.pose_num),
+										MoveRobotManuallyState(wait_time=2, pose_num=self.calib_pose_num),
 										transitions={'done': 'Find_First_Charuco'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'result_compute': 'result_compute'})
@@ -83,22 +83,23 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 			# x:144 y:121
 			OperatableStateMachine.add('Find_First_Charuco',
 										FindCharucoState(base_link=self.base_link, tip_link=self.tip_link),
-										transitions={'done': 'Generate_Points', 'go_compute': 'Generate_Points'},
+										transitions={'done': 'Find_First_Charuco', 'go_compute': 'Generate_Points'},
 										autonomy={'done': Autonomy.Off, 'go_compute': Autonomy.Off},
 										remapping={'result_compute': 'result_compute', 'base_h_tool': 'base_h_tool', 'camera_h_charuco': 'camera_h_charuco'})
 
 			# x:83 y:243
 			OperatableStateMachine.add('Generate_Points',
-										GenerateHandEyePoint(move_distance=self.move_distance, times=self.times),
+										GenerateHandEyePoint(move_distance=self.move_distance, times=self.times, group_name=self.group_name, reference_frame=self.reference_frame),
 										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points'})
 
-			# x:487 y:75
+			# x:527 y:68
 			OperatableStateMachine.add('Moveit_Execute_Points',
 										MoveitHandEyeExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
-										transitions={},
-										autonomy={})
+										transitions={'done': 'Find_Charuco', 'collision': 'failed'},
+										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off},
+										remapping={'hand_eye_points': 'hand_eye_points', 'result_compute': 'result_compute'})
 
 			# x:484 y:339
 			OperatableStateMachine.add('Calibration_Computation',

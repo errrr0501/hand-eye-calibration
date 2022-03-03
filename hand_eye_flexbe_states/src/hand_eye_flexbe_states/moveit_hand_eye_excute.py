@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
 import rospy
+import numpy as np
 import moveit_commander
 from moveit_msgs.msg import MoveItErrorCodes
 from math import pi, radians
 from std_msgs.msg import String
+import geometry_msgs.msg
 from moveit_commander.conversions import pose_to_list
 from tf import transformations as tf
 
@@ -39,20 +41,21 @@ class MoveitHandEyeExecuteState(EventState):
 		'''
 		Constructor
 		'''
-		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['done', 'failed', 'collision'],
-											#input_keys=['joint_trajectory', 'target_joints'],
-											#output_keys=['joint_config'])
+		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['done', 'collision'],
+											input_keys=['hand_eye_points'],
+											output_keys=['result_compute'])
 		# group_name = ""
 		self._group_name = group_name
-		self._reference_frame = reference_fram
+		self._reference_frame = reference_frame
 		self._move_group = moveit_commander.MoveGroupCommander(self._group_name)
 		self._result = MoveItErrorCodes.FAILURE
-		self._reference_frame = 'base'
 		self._move_group.set_pose_reference_frame(self._reference_frame)
 		self._end_effector_link = self._move_group.get_end_effector_link()
 		self._move_group.set_end_effector_link(self._end_effector_link)
 		self._move_group.set_max_acceleration_scaling_factor(0.1)
 		self._move_group.set_max_velocity_scaling_factor(0.1)
+		self.points_num  = 0
+		self.execute_num = 0
 
 	def stop(self):
 		pass
@@ -66,21 +69,41 @@ class MoveitHandEyeExecuteState(EventState):
 		print(self._result)
 		print("==================================================================")
 		print("")
+		self.points_num = np.size(userdata.hand_eye_points['x'])
+		# userdata.hand_eye_points['x']
+		# userdata.hand_eye_points['y']
+		# userdata.hand_eye_points['z']
+		# userdata.hand_eye_points['qw']
+		# userdata.hand_eye_points['qx']
+		# userdata.hand_eye_points['qy']
+		# userdata.hand_eye_points['qz']
+		pose_goal = geometry_msgs.msg.Pose()
+		pose_goal.position.x    = userdata.hand_eye_points['x'][self.execute_num]
+		pose_goal.position.y    = userdata.hand_eye_points['y'][self.execute_num]   
+		pose_goal.position.z    = userdata.hand_eye_points['z'][self.execute_num]
+		pose_goal.orientation.x = userdata.hand_eye_points['qw'][self.execute_num]
+		pose_goal.orientation.y = userdata.hand_eye_points['qx'][self.execute_num]
+		pose_goal.orientation.z = userdata.hand_eye_points['qy'][self.execute_num]
+		pose_goal.orientation.w = userdata.hand_eye_points['qz'][self.execute_num]
+		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
+		self._result = self._move_group.go(wait=True)
+		self._move_group.stop()
+		self._move_group.clear_pose_targets()
+		print(self._move_group.get_current_pose())
+		userdata.result_compute = self.execute_num >= self.points_num
+
 		if self._result == MoveItErrorCodes.SUCCESS:
+			self.execute_num += 1
 			return 'done'
-		else:
-			userdata.joint_config = userdata.target_joints
-			return 'collision'
 			
-		# if self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
-		# 	userdata.joint_config = userdata.target_joints
-		# 	return 'collision'
+		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
+			return 'collision'
 		# else:
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
 		# self._result = self._move_group.execute(userdata.joint_trajectory)
-		self._result = self._move_group.execute(userdata.joint_trajectory)
+		pass
 
 	def on_stop(self):
 		pass

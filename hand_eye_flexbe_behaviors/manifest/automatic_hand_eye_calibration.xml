@@ -18,7 +18,7 @@
 
 		<param type="boolean" name="eye_in_hand" default="False" label="eye_in_hand" hint="Sets the eye_in_hand" />
 
-		<param type="numeric" name="calib_pose_num" default="10" label="calib_pose_num" hint="Sets the calib_pose_num">
+		<param type="numeric" name="calib_pose_num" default="0" label="calib_pose_num" hint="Sets the calib_pose_num">
 			<min value="0" />
 			<max value="20" />
 		</param>
@@ -29,17 +29,17 @@
 
 		<param type="text" name="calibration_file_name" default="hand_eye_calibration.ini" label="calibration_file_name" hint="Sets the calibration_file_name" />
 
-		<param type="numeric" name="move_distance" default="5" label="move_distance" hint="Sets the move_distance">
-			<min value="0" />
-			<max value="10" />
-		</param>
-
-		<param type="numeric" name="times" default="1" label="times" hint="Sets the times">
+		<param type="numeric" name="move_distance" default="10" label="move_distance" hint="Sets the move_distance">
 			<min value="0" />
 			<max value="20" />
 		</param>
 
-		<param type="text" name="reference_frame" default="base" label="reference_frame" hint="Sets the reference_frame" />
+		<param type="numeric" name="times" default="10" label="times" hint="Sets the times">
+			<min value="0" />
+			<max value="20" />
+		</param>
+
+		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />
 
 		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
 
