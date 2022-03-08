@@ -23,7 +23,7 @@
 			<max value="20" />
 		</param>
 
-		<param type="text" name="base_link" default="/base" label="base_link" hint="Sets the base_link" />
+		<param type="text" name="base_link" default="/base_link" label="base_link" hint="Sets the base_link" />
 
 		<param type="text" name="tip_link" default="/tool0_controller" label="tip_link" hint="Sets the tip_link" />
 
@@ -34,14 +34,26 @@
 			<max value="20" />
 		</param>
 
-		<param type="numeric" name="times" default="10" label="times" hint="Sets the times">
-			<min value="0" />
-			<max value="20" />
-		</param>
-
 		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />
 
 		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
+
+		<param type="text" name="axis" default="xyz" label="axis" hint="Sets the axis" />
+
+		<param type="numeric" name="x_axis" default="1" label="x_axis" hint="Sets the x_axis">
+			<min value="-1" />
+			<max value="1" />
+		</param>
+
+		<param type="numeric" name="y_axis" default="-1" label="y_axis" hint="Sets the y_axis">
+			<min value="-1" />
+			<max value="1" />
+		</param>
+
+		<param type="numeric" name="z_axis" default="1" label="z_axis" hint="Sets the z_axis">
+			<min value="-1" />
+			<max value="1" />
+		</param>
 
 	</params>
 

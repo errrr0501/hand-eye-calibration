@@ -36,13 +36,16 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		# parameters of this behavior
 		self.add_parameter('eye_in_hand', False)
 		self.add_parameter('calib_pose_num', 0)
-		self.add_parameter('base_link', '/base')
+		self.add_parameter('base_link', '/base_link')
 		self.add_parameter('tip_link', '/tool0_controller')
 		self.add_parameter('calibration_file_name', 'hand_eye_calibration.ini')
 		self.add_parameter('move_distance', 10)
-		self.add_parameter('times', 10)
 		self.add_parameter('reference_frame', 'base_link')
 		self.add_parameter('group_name', 'manipulator')
+		self.add_parameter('axis', 'xyz')
+		self.add_parameter('x_axis', 1)
+		self.add_parameter('y_axis', -1)
+		self.add_parameter('z_axis', 1)
 
 		# references to used behaviors
 
@@ -89,7 +92,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 			# x:83 y:243
 			OperatableStateMachine.add('Generate_Points',
-										GenerateHandEyePoint(move_distance=self.move_distance, times=self.times, group_name=self.group_name, reference_frame=self.reference_frame),
+										GenerateHandEyePoint(move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, x=self.x_axis, y=self.y_axis, z=self.z_axis, axis=self.axis),
 										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points'})

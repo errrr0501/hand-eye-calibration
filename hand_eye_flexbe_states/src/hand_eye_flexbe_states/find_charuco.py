@@ -55,7 +55,9 @@ class FindCharucoState(EventState):
 		self.camera_h_charuco.transforms.append(trans)
 		# print(self.camera_h_charuco.transforms)
 		# print(self.camera_h_charuco)
-		print(self.camera_h_charuco.transforms[0].translation.x)
+		# print(self.camera_h_charuco.transforms[0].translation.x)
+		# print(self.camera_h_charuco.transforms[0].translation.y)
+		# print(self.camera_h_charuco.transforms[0].translation.z)
 		# print("============================")
 
 		trans = Transform()
