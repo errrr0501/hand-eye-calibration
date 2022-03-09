@@ -38,7 +38,7 @@ class GenerateHandEyePoint(EventState):
 	"""
 
 
-	def __init__(self, move_distance, group_name, reference_frame, x, y, z , axis):
+	def __init__(self, move_distance, group_name, reference_frame, cam_x, cam_y, cam_z , axis):
 		'''
 		Constructor
 		'''
@@ -67,15 +67,11 @@ class GenerateHandEyePoint(EventState):
 		self.base_rotation_y = 1
 		self.base_rotation_z = 1
 		self._axis = axis
-		self.axis_x = x
-		self.axis_y = y
-		self.axis_z = z
-		# self.axis_x = 1
-		# self.axis_y = -1
-		# self.axis_z = 1
+		self.cam_axis_x = cam_x
+		self.cam_axis_y = cam_y
+		self.cam_axis_z = cam_z
 
 
-#zyx
 
 	def stop(self):
 		pass
@@ -99,13 +95,63 @@ class GenerateHandEyePoint(EventState):
 			print(userdata.camera_h_charuco.transforms[0].translation.y)
 			print(userdata.camera_h_charuco.transforms[0].translation.z)
 			if  self._axis == "xyz":
-				self.points_x.append(self.base_rotation_x*self._current_pose.pose.position.x  + self.axis_x*(0.08 + userdata.camera_h_charuco.transforms[0].translation.x))
-				self.points_y.append(self.base_rotation_y*self._current_pose.pose.position.y  + self.axis_y*(0.05 + userdata.camera_h_charuco.transforms[0].translation.y))
-				self.points_z.append(self.base_rotation_z*self._current_pose.pose.position.z  + self.axis_z*(-0.30 + userdata.camera_h_charuco.transforms[0].translation.z))
+				self.points_x.append(self.base_rotation_x*self._current_pose.pose.position.x  + self.cam_axis_x*(-0.08 - userdata.camera_h_charuco.transforms[0].translation.x))
+				self.points_y.append(self.base_rotation_y*self._current_pose.pose.position.y  + self.cam_axis_y*(-0.05 - userdata.camera_h_charuco.transforms[0].translation.y))
+				self.points_z.append(self.base_rotation_z*self._current_pose.pose.position.z  + self.cam_axis_z*(0.30 - userdata.camera_h_charuco.transforms[0].translation.z))
+				self.points_qx.append(self._current_pose.pose.orientation.x)
+				self.points_qy.append(self._current_pose.pose.orientation.y)
+				self.points_qz.append(self._current_pose.pose.orientation.z)
+				self.points_qw.append(self._current_pose.pose.orientation.w)
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+
+				for i in range(6):
+					self.points_x.append(self.points_x[0]  + self.cam_axis_x*self.move_distance*0.01)
+					self.points_y.append(self.points_y[0]  - self.cam_axis_y*self.move_distance*0.01 + self.cam_axis_y*0.035*i)
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+					
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(6,12):
+					self.points_x.append(self.points_x[6]  + 0.035*(i-6))
+					self.points_y.append(self.points_y[6])
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]-15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(12,18):
+					self.points_x.append(self.points_x[12])
+					self.points_y.append(self.points_y[6]  - self.cam_axis_y*0.035*(i-12))
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(18,24):
+					self.points_x.append(self.points_x[18]  - 0.035*(i-18))
+					self.points_y.append(self.points_y[18])
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
 			elif self._axis == "zxy":
-				self.points_x.append(self._current_pose.pose.position.y  + self.axis_x*(0.08 + userdata.camera_h_charuco.transforms[0].translation.x))
-				self.points_y.append(self._current_pose.pose.position.z  + self.axis_y*(0.05 + userdata.camera_h_charuco.transforms[0].translation.y))
-				self.points_z.append(self._current_pose.pose.position.x  + self.axis_z*(-0.30 + userdata.camera_h_charuco.transforms[0].translation.z))
+				self.points_x.append(self._current_pose.pose.position.y  + self.cam_axis_x*(-0.08 - userdata.camera_h_charuco.transforms[0].translation.x))
+				self.points_y.append(self._current_pose.pose.position.z  + self.cam_axis_y*(-0.05 - userdata.camera_h_charuco.transforms[0].translation.y))
+				self.points_z.append(self._current_pose.pose.position.x  + self.cam_axis_z*(0.30 - userdata.camera_h_charuco.transforms[0].translation.z))
 			
 			# if self._axis == "xzy":
 			# 	self.points_x.append(self._current_pose.pose.position.x  + self.axis_x*(0.08 + userdata.camera_h_charuco.transforms[0].translation.x))
@@ -128,56 +174,56 @@ class GenerateHandEyePoint(EventState):
 			# 	self.points_y.append(self._current_pose.pose.position.z  + self.axis_y*(0.05 + userdata.camera_h_charuco.transforms[0].translation.y))
 			# 	self.points_z.append(self._current_pose.pose.position.x  + self.axis_z*(-0.30 + userdata.camera_h_charuco.transforms[0].translation.z))
 			
-			self.points_qx.append(self._current_pose.pose.orientation.x)
-			self.points_qy.append(self._current_pose.pose.orientation.y)
-			self.points_qz.append(self._current_pose.pose.orientation.z)
-			self.points_qw.append(self._current_pose.pose.orientation.w)
-			quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
-			##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				self.points_qx.append(self._current_pose.pose.orientation.x)
+				self.points_qy.append(self._current_pose.pose.orientation.y)
+				self.points_qz.append(self._current_pose.pose.orientation.z)
+				self.points_qw.append(self._current_pose.pose.orientation.w)
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
 
-			for i in range(6):
-				self.points_x.append(self.points_x[0]  - self.axis_x*self.move_distance*0.01)
-				self.points_y.append(self.points_y[0]  + self.axis_y*self.move_distance*0.01 - self.axis_y*0.035*i)
-				self.points_z.append(self.points_z[0])
-				self.points_qx.append(quaternion[0])
-				self.points_qy.append(quaternion[1])
-				self.points_qz.append(quaternion[2])
-				self.points_qw.append(quaternion[3])
-				i += 1
-				
-			quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
-			##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
-			for i in range(6,12):
-				self.points_x.append(self.points_x[6]  + 0.035*(i-6))
-				self.points_y.append(self.points_y[6])
-				self.points_z.append(self.points_z[0])
-				self.points_qx.append(quaternion[0])
-				self.points_qy.append(quaternion[1])
-				self.points_qz.append(quaternion[2])
-				self.points_qw.append(quaternion[3])
-				i += 1
-			quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]-15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
-			##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
-			for i in range(12,18):
-				self.points_x.append(self.points_x[12])
-				self.points_y.append(self.points_y[6]  + self.axis_y*0.035*(i-12))
-				self.points_z.append(self.points_z[0])
-				self.points_qx.append(quaternion[0])
-				self.points_qy.append(quaternion[1])
-				self.points_qz.append(quaternion[2])
-				self.points_qw.append(quaternion[3])
-				i += 1
-			quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
-			##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
-			for i in range(18,24):
-				self.points_x.append(self.points_x[18]  - 0.035*(i-18))
-				self.points_y.append(self.points_y[18])
-				self.points_z.append(self.points_z[0])
-				self.points_qx.append(quaternion[0])
-				self.points_qy.append(quaternion[1])
-				self.points_qz.append(quaternion[2])
-				self.points_qw.append(quaternion[3])
-				i += 1
+				for i in range(6):
+					self.points_x.append(self.points_x[0]  + self.cam_axis_y*self.move_distance*0.01)
+					self.points_y.append(self.points_y[0]  - self.cam_axis_z*self.move_distance*0.01 + self.cam_axis_z*0.035*i)
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+					
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(6,12):
+					self.points_x.append(self.points_x[6]  + 0.035*(i-6))
+					self.points_y.append(self.points_y[6])
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]-15),np.radians(self._origin_euler[1]), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(12,18):
+					self.points_x.append(self.points_x[12])
+					self.points_y.append(self.points_y[6]  - self.cam_axis_z*0.035*(i-12))
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]),np.radians(self._origin_euler[1]-15), np.radians(self._origin_euler[2]))  
+				##############################################yaw_angle, ##########################pitch_angle, ######################roll_angle  
+				for i in range(18,24):
+					self.points_x.append(self.points_x[18]  - 0.035*(i-18))
+					self.points_y.append(self.points_y[18])
+					self.points_z.append(self.points_z[0])
+					self.points_qx.append(quaternion[0])
+					self.points_qy.append(quaternion[1])
+					self.points_qz.append(quaternion[2])
+					self.points_qw.append(quaternion[3])
+					i += 1
 
 
 		# elif self.move_distance <= 20 and self.move_distance >= 10:
