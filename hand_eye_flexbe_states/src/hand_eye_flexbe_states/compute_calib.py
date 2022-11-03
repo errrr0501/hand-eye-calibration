@@ -41,7 +41,7 @@ class ComputeCalibState(EventState):
 		print('qy = ' + str(res.effector_camera.rotation.y))
 		print('qz = ' + str(res.effector_camera.rotation.z))
 
-		config = configparser.configparser()
+		config = configparser.ConfigParser()
 		config.optionxform = str #reference: http://docs.python.org/library/configparser.html
 		rospack = rospkg.RosPack()
 		curr_path = rospack.get_path('charuco_detector')

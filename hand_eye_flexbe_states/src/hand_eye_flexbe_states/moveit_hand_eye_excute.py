@@ -79,7 +79,7 @@ class MoveitHandEyeExecuteState(EventState):
 		pose_goal.orientation.y = userdata.hand_eye_points['qy'][self.execute_num]
 		pose_goal.orientation.z = userdata.hand_eye_points['qz'][self.execute_num]
 		pose_goal.orientation.w = userdata.hand_eye_points['qw'][self.execute_num]
-		# raw_input()
+		input()
 		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
 		self._result = self._move_group.go(wait=True)
 		self._move_group.stop()

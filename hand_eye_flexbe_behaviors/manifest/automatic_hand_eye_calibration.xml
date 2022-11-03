@@ -40,7 +40,7 @@
 
 		<param type="text" name="axis" default="xyz" label="axis" hint="Sets the axis" />
 
-		<param type="numeric" name="cam_x" default="-1" label="cam_x" hint="Sets the cam_x">
+		<param type="numeric" name="cam_x" default="1" label="cam_x" hint="Sets the cam_x">
 			<min value="-1" />
 			<max value="1" />
 		</param>
@@ -50,7 +50,7 @@
 			<max value="1" />
 		</param>
 
-		<param type="numeric" name="cam_z" default="-1" label="cam_z" hint="Sets the cam_z">
+		<param type="numeric" name="cam_z" default="1" label="cam_z" hint="Sets the cam_z">
 			<min value="-1" />
 			<max value="1" />
 		</param>

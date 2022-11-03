@@ -43,9 +43,9 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		self.add_parameter('reference_frame', 'base_link')
 		self.add_parameter('group_name', 'manipulator')
 		self.add_parameter('axis', 'xyz')
-		self.add_parameter('cam_x', -1)
+		self.add_parameter('cam_x', 1)
 		self.add_parameter('cam_y', 1)
-		self.add_parameter('cam_z', -1)
+		self.add_parameter('cam_z', 1)
 
 		# references to used behaviors
 
