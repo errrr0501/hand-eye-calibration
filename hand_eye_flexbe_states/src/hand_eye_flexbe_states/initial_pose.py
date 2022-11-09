@@ -23,7 +23,7 @@ Created on 15.06.2015
 @author: Philipp Schillinger
 '''
 
-class MoveitHandEyeExecuteState(EventState):
+class InitialPose(EventState):
 	'''
 	Move robot by planned trajectory.
 
@@ -41,9 +41,7 @@ class MoveitHandEyeExecuteState(EventState):
 		'''
 		Constructor
 		'''
-		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['done', 'collision'],
-											input_keys=['hand_eye_points'],
-											output_keys=['result_compute'])
+		super(InitialPose, self).__init__(outcomes=['done', 'collision'])
 		# group_name = ""
 		self._group_name = group_name
 		self._reference_frame = reference_frame
@@ -54,9 +52,6 @@ class MoveitHandEyeExecuteState(EventState):
 		self._move_group.set_end_effector_link(self._end_effector_link)
 		self._move_group.set_max_acceleration_scaling_factor(0.1)
 		self._move_group.set_max_velocity_scaling_factor(0.1)
-		self.points_num  = 0
-		self.execute_num = 0
-		self._execute_times = 0
 
 	def stop(self):
 		pass
@@ -70,37 +65,19 @@ class MoveitHandEyeExecuteState(EventState):
 		print(self._result)
 		print("==================================================================")
 		print("")
-		self.points_num = np.size(userdata.hand_eye_points['x'])
-		pose_goal = geometry_msgs.msg.Pose()
-		pose_goal.position.x    = userdata.hand_eye_points['x'][self.execute_num]
-		pose_goal.position.y    = userdata.hand_eye_points['y'][self.execute_num]   
-		pose_goal.position.z    = userdata.hand_eye_points['z'][self.execute_num]
-		pose_goal.orientation.x = userdata.hand_eye_points['qx'][self.execute_num]
-		pose_goal.orientation.y = userdata.hand_eye_points['qy'][self.execute_num]
-		pose_goal.orientation.z = userdata.hand_eye_points['qz'][self.execute_num]
-		pose_goal.orientation.w = userdata.hand_eye_points['qw'][self.execute_num]
-		input()
-		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
-		self._result = self._move_group.go(wait=True)
+		joint_goal= self._move_group.get_current_joint_values()
+		joint_goal[0] = -pi * 0.5
+		joint_goal[1] = -pi * 0.5
+		joint_goal[2] = -pi * 0.5
+		joint_goal[3] = -pi * 0.5
+		joint_goal[4] =  pi * 0.5
+		joint_goal[5] =  pi * 0.5    
+		self._move_group.go(joint_goal, wait=True)
 		self._move_group.stop()
 		self._move_group.clear_pose_targets()
-		userdata.result_compute = self._execute_times >= self.points_num-1	
+		# current_joints = self._move_group.get_current_joint_values()
+		# origin_orientation =  self._move_group.get_current_pose().pose.orientation
 
-		current_pose = self._move_group.get_current_pose()
-		print("current pose",current_pose)
-
-		if userdata.result_compute:
-			pose_goal.position.x    = userdata.hand_eye_points['x'][0]
-			pose_goal.position.y    = userdata.hand_eye_points['y'][0]   
-			pose_goal.position.z    = userdata.hand_eye_points['z'][0]
-			pose_goal.orientation.x = userdata.hand_eye_points['qx'][0]
-			pose_goal.orientation.y = userdata.hand_eye_points['qy'][0]
-			pose_goal.orientation.z = userdata.hand_eye_points['qz'][0]
-			pose_goal.orientation.w = userdata.hand_eye_points['qw'][0]
-			self._move_group.set_pose_target(pose_goal, self._end_effector_link)
-			self._result = self._move_group.go(wait=True)
-			self._move_group.stop()
-			self._move_group.clear_pose_targets()
 		if self._result == MoveItErrorCodes.SUCCESS:
 			self.execute_num += 1
 			return 'done'

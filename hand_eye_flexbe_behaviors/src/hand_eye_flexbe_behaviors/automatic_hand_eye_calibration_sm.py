@@ -11,6 +11,7 @@ from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyC
 from hand_eye_flexbe_states.compute_calib import ComputeCalibState
 from hand_eye_flexbe_states.find_charuco import FindCharucoState
 from hand_eye_flexbe_states.generate_hand_eye_point import GenerateHandEyePoint
+from hand_eye_flexbe_states.initial_pose import InitialPose
 from hand_eye_flexbe_states.move_robot_manually import MoveRobotManuallyState
 from hand_eye_flexbe_states.moveit_hand_eye_excute import MoveitHandEyeExecuteState
 # Additional imports can be added inside the following tags
@@ -59,7 +60,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 
 	def create(self):
-		# x:308 y:369, x:130 y:365
+		# x:275 y:503, x:130 y:365
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
@@ -75,6 +76,13 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 										transitions={'done': 'Find_First_Charuco'},
 										autonomy={'done': Autonomy.Off},
 										remapping={'result_compute': 'result_compute'})
+
+			# x:564 y:364
+			OperatableStateMachine.add('Calibration_Computation',
+										ComputeCalibState(eye_in_hand_mode=self.eye_in_hand, calibration_file_name=self.calibration_file_name),
+										transitions={'finish': 'Back_to_Initial_Pose'},
+										autonomy={'finish': Autonomy.Off},
+										remapping={'base_h_tool': 'base_h_tool', 'camera_h_charuco': 'camera_h_charuco'})
 
 			# x:501 y:227
 			OperatableStateMachine.add('Find_Charuco',
@@ -104,12 +112,11 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off},
 										remapping={'hand_eye_points': 'hand_eye_points', 'result_compute': 'result_compute'})
 
-			# x:484 y:339
-			OperatableStateMachine.add('Calibration_Computation',
-										ComputeCalibState(eye_in_hand_mode=self.eye_in_hand, calibration_file_name=self.calibration_file_name),
-										transitions={'finish': 'finished'},
-										autonomy={'finish': Autonomy.Off},
-										remapping={'base_h_tool': 'base_h_tool', 'camera_h_charuco': 'camera_h_charuco'})
+			# x:376 y:308
+			OperatableStateMachine.add('Back_to_Initial_Pose',
+										InitialPose(group_name=self.group_name, reference_frame=self.reference_frame),
+										transitions={'done': 'finished', 'collision': 'failed'},
+										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off})
 
 
 		return _state_machine
