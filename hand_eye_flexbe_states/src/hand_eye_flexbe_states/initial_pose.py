@@ -60,26 +60,20 @@ class InitialPose(EventState):
 		'''
 		Execute this state
 		'''
-		print("")
-		print("==================================================================")
-		print(self._result)
-		print("==================================================================")
-		print("")
 		joint_goal= self._move_group.get_current_joint_values()
-		joint_goal[0] = -pi * 0.5
+		joint_goal[0] =  pi * 0.5
 		joint_goal[1] = -pi * 0.5
-		joint_goal[2] = -pi * 0.5
+		joint_goal[2] =  pi * 0.5
 		joint_goal[3] = -pi * 0.5
-		joint_goal[4] =  pi * 0.5
-		joint_goal[5] =  pi * 0.5    
-		self._move_group.go(joint_goal, wait=True)
+		joint_goal[4] = -pi * 0.5
+		joint_goal[5] = -pi * 0.5    
+		self._result = self._move_group.go(joint_goal, wait=True)
 		self._move_group.stop()
 		self._move_group.clear_pose_targets()
 		# current_joints = self._move_group.get_current_joint_values()
 		# origin_orientation =  self._move_group.get_current_pose().pose.orientation
 
 		if self._result == MoveItErrorCodes.SUCCESS:
-			self.execute_num += 1
 			return 'done'
 			
 		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
@@ -88,7 +82,6 @@ class InitialPose(EventState):
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
-		self._execute_times += 1
 		pass
 
 	def on_stop(self):

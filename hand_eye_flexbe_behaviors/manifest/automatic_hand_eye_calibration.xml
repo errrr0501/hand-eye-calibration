@@ -55,6 +55,11 @@
 			<max value="1" />
 		</param>
 
+		<param type="numeric" name="points_num" default="24" label="points_num" hint="Sets the points_num">
+			<min value="0" />
+			<max value="24" />
+		</param>
+
 	</params>
 
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 import numpy as np
@@ -37,11 +37,11 @@ class MoveitHandEyeExecuteState(EventState):
 	'''
 
 
-	def __init__(self, group_name,reference_frame):
+	def __init__(self, group_name,reference_frame, points_num):
 		'''
 		Constructor
 		'''
-		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['done', 'collision'],
+		super(MoveitHandEyeExecuteState, self).__init__(outcomes=['received','done', 'collision'],
 											input_keys=['hand_eye_points'],
 											output_keys=['result_compute'])
 		# group_name = ""
@@ -54,56 +54,98 @@ class MoveitHandEyeExecuteState(EventState):
 		self._move_group.set_end_effector_link(self._end_effector_link)
 		self._move_group.set_max_acceleration_scaling_factor(0.1)
 		self._move_group.set_max_velocity_scaling_factor(0.1)
-		self.points_num  = 0
-		self.execute_num = 0
+		self._first_joints= self._move_group.get_current_joint_values()
+		self.points_num  = points_num+1
 		self._execute_times = 0
+		self.plan, self.fraction =0,0
 
-	def stop(self):
+	def start(self,userdata):
+		# self.points_num = np.size(userdata.hand_eye_points)
+		# print(np.size(userdata.hand_eye_points))
 		pass
+
+	# def execute(self, userdata):
+	# 	'''
+	# 	Execute this state
+	# 	'''
+	# 	print("")
+	# 	print("==================================================================")
+	# 	print(self._result)
+	# 	print("==================================================================")
+	# 	print("")
+	# 	self.points_num = np.size(userdata.hand_eye_points['x'])
+	# 	pose_goal = geometry_msgs.msg.Pose()
+	# 	pose_goal.position.x    = userdata.hand_eye_points['x'][self.execute_num]
+	# 	pose_goal.position.y    = userdata.hand_eye_points['y'][self.execute_num]   
+	# 	pose_goal.position.z    = userdata.hand_eye_points['z'][self.execute_num]
+	# 	pose_goal.orientation.x = userdata.hand_eye_points['qx'][self.execute_num]
+	# 	pose_goal.orientation.y = userdata.hand_eye_points['qy'][self.execute_num]
+	# 	pose_goal.orientation.z = userdata.hand_eye_points['qz'][self.execute_num]
+	# 	pose_goal.orientation.w = userdata.hand_eye_points['qw'][self.execute_num]
+	# 	input()
+	# 	self._move_group.set_pose_target(pose_goal, self._end_effector_link)
+	# 	self._result = self._move_group.go(wait=True)
+	# 	self._move_group.stop()
+	# 	self._move_group.clear_pose_targets()
+	# 	userdata.result_compute = self._execute_times >= self.points_num-1	
+
+	# 	current_pose = self._move_group.get_current_pose()
+	# 	print("current pose",current_pose)
+
+	# 	if userdata.result_compute:
+	# 		pose_goal.position.x    = userdata.hand_eye_points['x'][0]
+	# 		pose_goal.position.y    = userdata.hand_eye_points['y'][0]   
+	# 		pose_goal.position.z    = userdata.hand_eye_points['z'][0]
+	# 		pose_goal.orientation.x = userdata.hand_eye_points['qx'][0]
+	# 		pose_goal.orientation.y = userdata.hand_eye_points['qy'][0]
+	# 		pose_goal.orientation.z = userdata.hand_eye_points['qz'][0]
+	# 		pose_goal.orientation.w = userdata.hand_eye_points['qw'][0]
+	# 		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
+	# 		self._result = self._move_group.go(wait=True)
+	# 		self._move_group.stop()
+	# 		self._move_group.clear_pose_targets()
+	# 	if self._result == MoveItErrorCodes.SUCCESS:
+	# 		self.execute_num += 1
+	# 		return 'done'
+			
+	# 	elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
+	# 		return 'collision'
+	# 	# else:
+	# 	# 	return 'failed'
 
 	def execute(self, userdata):
 		'''
 		Execute this state
 		'''
-		print("")
+		# print("")
+		# print("==================================================================")
+		# print(self._result)
+		# print("==================================================================")
+		# print(np.size(userdata.hand_eye_points))
+		self.plan   = userdata.hand_eye_points[self._execute_times]
+		# input()
+		# excute planing path
+		self._result = self._move_group.execute(self.plan, wait=True)
+		# self._move_group.stop()
+		# self._move_group.clear_pose_targets()
+		userdata.result_compute = self._execute_times >= self.points_num
 		print("==================================================================")
-		print(self._result)
+		print(userdata.result_compute)
 		print("==================================================================")
-		print("")
-		self.points_num = np.size(userdata.hand_eye_points['x'])
-		pose_goal = geometry_msgs.msg.Pose()
-		pose_goal.position.x    = userdata.hand_eye_points['x'][self.execute_num]
-		pose_goal.position.y    = userdata.hand_eye_points['y'][self.execute_num]   
-		pose_goal.position.z    = userdata.hand_eye_points['z'][self.execute_num]
-		pose_goal.orientation.x = userdata.hand_eye_points['qx'][self.execute_num]
-		pose_goal.orientation.y = userdata.hand_eye_points['qy'][self.execute_num]
-		pose_goal.orientation.z = userdata.hand_eye_points['qz'][self.execute_num]
-		pose_goal.orientation.w = userdata.hand_eye_points['qw'][self.execute_num]
-		input()
-		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
-		self._result = self._move_group.go(wait=True)
-		self._move_group.stop()
-		self._move_group.clear_pose_targets()
-		userdata.result_compute = self._execute_times >= self.points_num-1	
+		print(self._execute_times)
+		print(self.points_num)
 
-		current_pose = self._move_group.get_current_pose()
-		print("current pose",current_pose)
+
+		# current_pose = self._move_group.get_current_pose()
+		# print("current pose",current_pose)
 
 		if userdata.result_compute:
-			pose_goal.position.x    = userdata.hand_eye_points['x'][0]
-			pose_goal.position.y    = userdata.hand_eye_points['y'][0]   
-			pose_goal.position.z    = userdata.hand_eye_points['z'][0]
-			pose_goal.orientation.x = userdata.hand_eye_points['qx'][0]
-			pose_goal.orientation.y = userdata.hand_eye_points['qy'][0]
-			pose_goal.orientation.z = userdata.hand_eye_points['qz'][0]
-			pose_goal.orientation.w = userdata.hand_eye_points['qw'][0]
-			self._move_group.set_pose_target(pose_goal, self._end_effector_link)
-			self._result = self._move_group.go(wait=True)
-			self._move_group.stop()
-			self._move_group.clear_pose_targets()
-		if self._result == MoveItErrorCodes.SUCCESS:
-			self.execute_num += 1
 			return 'done'
+
+		if self._result == MoveItErrorCodes.SUCCESS:
+			self._execute_times += 1
+			# print(self.execute_num)
+			return 'received'
 			
 		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
 			return 'collision'
@@ -111,7 +153,13 @@ class MoveitHandEyeExecuteState(EventState):
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
-		self._execute_times += 1
+		# back to first pose
+		self._result = self._move_group.go(self._first_joints, wait=True)
+		self._move_group.stop()
+		self._move_group.clear_pose_targets()
+		# self._execute_times += 1
+		# self.points_num = np.size(userdata.hand_eye_points)
+		# print(np.size(userdata.hand_eye_points))
 		pass
 
 	def on_stop(self):
@@ -121,4 +169,5 @@ class MoveitHandEyeExecuteState(EventState):
 		pass
 
 	def on_resume(self, userdata):
-		self.on_enter(userdata)
+		# self.on_enter(userdata)
+		pass

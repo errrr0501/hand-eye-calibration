@@ -47,6 +47,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		self.add_parameter('cam_x', 1)
 		self.add_parameter('cam_y', 1)
 		self.add_parameter('cam_z', 1)
+		self.add_parameter('points_num', 24)
 
 		# references to used behaviors
 
@@ -84,7 +85,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 										autonomy={'finish': Autonomy.Off},
 										remapping={'base_h_tool': 'base_h_tool', 'camera_h_charuco': 'camera_h_charuco'})
 
-			# x:501 y:227
+			# x:734 y:248
 			OperatableStateMachine.add('Find_Charuco',
 										FindCharucoState(base_link=self.base_link, tip_link=self.tip_link),
 										transitions={'done': 'Moveit_Execute_Points', 'go_compute': 'Calibration_Computation'},
@@ -100,19 +101,19 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 			# x:83 y:243
 			OperatableStateMachine.add('Generate_Points',
-										GenerateHandEyePoint(base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, cam_x=self.cam_x, cam_y=self.cam_y, cam_z=self.cam_z, axis=self.axis),
+										GenerateHandEyePoint(eye_in_hand_mode=self.eye_in_hand, base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num, cam_x=self.cam_x, cam_y=self.cam_y, cam_z=self.cam_z, axis=self.axis),
 										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points'})
 
-			# x:527 y:68
+			# x:468 y:112
 			OperatableStateMachine.add('Moveit_Execute_Points',
-										MoveitHandEyeExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
-										transitions={'done': 'Find_Charuco', 'collision': 'failed'},
-										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off},
+										MoveitHandEyeExecuteState(group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num),
+										transitions={'received': 'Find_Charuco', 'done': 'Find_Charuco', 'collision': 'failed'},
+										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'collision': Autonomy.Off},
 										remapping={'hand_eye_points': 'hand_eye_points', 'result_compute': 'result_compute'})
 
-			# x:376 y:308
+			# x:356 y:325
 			OperatableStateMachine.add('Back_to_Initial_Pose',
 										InitialPose(group_name=self.group_name, reference_frame=self.reference_frame),
 										transitions={'done': 'finished', 'collision': 'failed'},
