@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<behavior name="publish_camera_parameter">
+
+	<executable package_path="hand_eye_flexbe_behaviors.publish_camera_parameter_sm" class="publish_camera_parameterSM" />
+	<tagstring></tagstring>
+	<author>Luis</author>
+	<date>Wed Nov 16 2022</date>
+	<description>
+		publish_camera_parameter
+	</description>
+
+
+	<!-- Contained Behaviors -->
+
+	<!-- Available Parameters -->
+	<params>
+
+		<param type="text" name="file_name" default="camera_calibration.ini" label="file_name" hint="Sets the file_name" />
+
+	</params>
+
+
+</behavior>

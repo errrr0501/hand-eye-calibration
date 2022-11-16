@@ -4,6 +4,7 @@ import tf
 from flexbe_core import EventState
 from geometry_msgs.msg import Transform
 from visp_hand2eye_calibration.msg import TransformArray
+import time
 
 class FindCharucoState(EventState):
 	"""
@@ -28,6 +29,7 @@ class FindCharucoState(EventState):
 		self.enter_time = rospy.Time.now()
 
 	def execute(self, userdata):
+		time.sleep(1)
 		if (rospy.Time.now() - self.enter_time).to_sec() > 2:
 			rospy.logwarn('Can not get charuco board pose, abandon this position')
 			return 'done'
@@ -53,12 +55,12 @@ class FindCharucoState(EventState):
 		trans.rotation.z = camera_rot_charuco[2]
 		trans.rotation.w = camera_rot_charuco[3]
 		self.camera_h_charuco.transforms.append(trans)
-		# print(self.camera_h_charuco.transforms)
+		print(self.camera_h_charuco.transforms)
 		# print(self.camera_h_charuco)
 		# print(self.camera_h_charuco.transforms[0].translation.x)
 		# print(self.camera_h_charuco.transforms[0].translation.y)
 		# print(self.camera_h_charuco.transforms[0].translation.z)
-		# print("============================")
+		print("============================")
 
 		trans = Transform()
 		trans.translation.x = base_trans_tool[0]
@@ -69,8 +71,8 @@ class FindCharucoState(EventState):
 		trans.rotation.z = base_rot_tool[2]
 		trans.rotation.w = base_rot_tool[3]
 		self.base_h_tool.transforms.append(trans)
-		# print(self.base_h_tool.transforms)
-		# print("============================")
+		print(self.base_h_tool.transforms)
+		print("============================")
 
 
 		if userdata.result_compute:

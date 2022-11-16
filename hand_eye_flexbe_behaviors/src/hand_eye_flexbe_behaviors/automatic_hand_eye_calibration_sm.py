@@ -40,7 +40,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		self.add_parameter('base_link', '/base_link')
 		self.add_parameter('tip_link', '/tool0_controller')
 		self.add_parameter('calibration_file_name', 'hand_eye_calibration.ini')
-		self.add_parameter('move_distance', 10)
+		self.add_parameter('move_distance', 0.1)
 		self.add_parameter('reference_frame', 'base_link')
 		self.add_parameter('group_name', 'manipulator')
 		self.add_parameter('axis', 'xyz')

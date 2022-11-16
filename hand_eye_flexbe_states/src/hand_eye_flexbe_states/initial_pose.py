@@ -70,8 +70,7 @@ class InitialPose(EventState):
 		self._result = self._move_group.go(joint_goal, wait=True)
 		self._move_group.stop()
 		self._move_group.clear_pose_targets()
-		# current_joints = self._move_group.get_current_joint_values()
-		# origin_orientation =  self._move_group.get_current_pose().pose.orientation
+
 
 		if self._result == MoveItErrorCodes.SUCCESS:
 			return 'done'

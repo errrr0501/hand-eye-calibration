@@ -6,8 +6,8 @@
     <arg name="camera_info_topic" default="/camera/color/camera_info" />
     <!--<arg name="camera_info_topic" default="/camera/color/camera_info" />-->
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-    </include>
+    <!--<include file="$(find realsense2_camera)/launch/rs_hand_eye.launch">
+    </include>-->
 
     <include file="$(find ur_robot_driver)/launch/ur5_bringup.launch">
         <arg name="robot_ip" value="$(arg robot_ip)" />

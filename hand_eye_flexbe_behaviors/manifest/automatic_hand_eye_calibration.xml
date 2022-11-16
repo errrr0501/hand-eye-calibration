@@ -29,9 +29,9 @@
 
 		<param type="text" name="calibration_file_name" default="hand_eye_calibration.ini" label="calibration_file_name" hint="Sets the calibration_file_name" />
 
-		<param type="numeric" name="move_distance" default="10" label="move_distance" hint="Sets the move_distance">
+		<param type="numeric" name="move_distance" default="0.1" label="move_distance" hint="Sets the move_distance">
 			<min value="0" />
-			<max value="20" />
+			<max value="0.3" />
 		</param>
 
 		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />

@@ -24,12 +24,15 @@ class ComputeCalibState(EventState):
 		super(ComputeCalibState, self).__init__(outcomes=['finish'], input_keys=['base_h_tool', 'camera_h_charuco'])
 		self.eye_in_hand_mode = eye_in_hand_mode
 		self.calibration_file_name = str(calibration_file_name)
-		self.trans_A_list = TransformArray()
-		self.trans_B_list = TransformArray()
+		self.camera_object_list = TransformArray()
+		self.world_effector_list = TransformArray()
 		self.calib_compute_client = ProxyServiceCaller({'/compute_effector_camera_quick': compute_effector_camera_quick})
     
 	def execute(self, userdata):
-		req = compute_effector_camera_quickRequest(self.trans_A_list, self.trans_B_list)
+		req = compute_effector_camera_quickRequest(self.camera_object_list, self.world_effector_list)
+		print("^^^^^^^^^^^^^^^^^^^")
+		# print(req.camera_object)
+		# print(req.world_effector)
 		print ("========================================================================================================")
 		res = self.calib_compute_client.call('/compute_effector_camera_quick', req)
 		
@@ -60,12 +63,14 @@ class ComputeCalibState(EventState):
 		return 'finish'
 	
 	def on_enter(self, userdata):
-		self.trans_A_list = userdata.camera_h_charuco
+		self.camera_object_list = userdata.camera_h_charuco
+		# print(self.camera_object_list)
 		if self.eye_in_hand_mode:
 			print("------------------------------------------------------------------")
-			self.trans_B_list = userdata.base_h_tool
+			self.world_effector_list = userdata.base_h_tool
+			# print(self.world_effector_list)
 		else:
-			self.trans_B_list.header = userdata.base_h_tool.header
+			self.world_effector_list.header = userdata.base_h_tool.header
 			print ("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 			print (userdata.base_h_tool)
 			for transform in userdata.base_h_tool.transforms:
@@ -77,4 +82,4 @@ class ComputeCalibState(EventState):
 				trans_B.translation.x, trans_B.translation.y, trans_B.translation.z = trans[:3, 3]
 				trans_B.rotation.x, trans_B.rotation.y, trans_B.rotation.z, \
 					trans_B.rotation.w = tf.transformations.quaternion_from_matrix(trans)
-				self.trans_B_list.transforms.append(trans_B)
+				self.world_effector_list.transforms.append(trans_B)

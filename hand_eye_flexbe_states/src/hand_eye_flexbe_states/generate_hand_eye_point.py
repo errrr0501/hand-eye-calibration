@@ -58,14 +58,6 @@ class GenerateHandEyePoint(EventState):
 		self.tip_link = tip_link
 		self.tf_listener = tf.TransformListener()
 		# self.tool_h_base = TransformArray()
-		# self.times = int(times)
-		# self.points_x = []
-		# self.points_y = []
-		# self.points_z = []
-		# self.points_qw = []
-		# self.points_qx = []
-		# self.points_qy = []
-		# self.points_qz = []
 		self.waypoints = []
 		self.plan_path = []
 		
@@ -96,7 +88,7 @@ class GenerateHandEyePoint(EventState):
 
 
 
-	def start(self):
+	def on_start(self):
 		pass
 
 	def execute(self, userdata):
@@ -116,8 +108,7 @@ class GenerateHandEyePoint(EventState):
 			
 		# if self._result =origindegree
 	def on_enter(self, userdata):
-		# print("fajklfjlka;jfklafkl;jaklfjalk;jfkla;jdf;klaj;flaflkjalk;jfkl;ajfkljaklfjakl")
-		# print("fajklfjlka;jfklafkl;jaklfjalk;jfkla;jdf;klaj;flaflkjalk;jfkl;ajfkljaklfjakl")
+
 		origindegree = euler_from_quaternion([self._first_pose.pose.orientation.x, self._first_pose.pose.orientation.y, self._first_pose.pose.orientation.z, self._first_pose.pose.orientation.w])
 		self._origin_euler[0] = origindegree[0]/3.14*180.0
 		self._origin_euler[1] = origindegree[1]/3.14*180.0
@@ -128,8 +119,10 @@ class GenerateHandEyePoint(EventState):
 		# self.points.hand_eye_points['x'] = userdata.camera_h_charuco.transforms.x
 
 		
-
-		if self.move_distance <= 11.0:
+		print(self.move_distance)
+		print("=====================================================================")
+		if self.move_distance <= 0.11:
+			
 
 			# baseltrans = tf.transformations.translation_matrix((-self._first_pose.pose.position.x, -self._first_pose.pose.position.y, self._first_pose.pose.position.z))
 			# baserot = tf.transformations.quaternion_matrix((self._first_pose.pose.orientation.x, self._first_pose.pose.orientation.y, self._first_pose.pose.orientation.z, self._first_pose.pose.orientation.w))
@@ -156,11 +149,13 @@ class GenerateHandEyePoint(EventState):
 
 
 			if  self._axis == "xyz":
-				# First move up (z)
-				self.wpose.position.z += self.cam_axis_z*(0.45-userdata.camera_h_charuco.transforms[0].translation.z)  # First move up (z)
-				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(45-aruco_rotation_degree[0])),
-													np.radians(self._origin_euler[1]+(10-aruco_rotation_degree[1])), 
-													np.radians(self._origin_euler[2]))  	
+				print("=====================================================================")
+				self.wpose.position.x += self.cam_axis_x*(0.096-abs(userdata.camera_h_charuco.transforms[0].translation.y))
+				self.wpose.position.y += self.cam_axis_y*(0.135-abs(userdata.camera_h_charuco.transforms[0].translation.x))
+				self.wpose.position.z += self.cam_axis_z*(0.55-userdata.camera_h_charuco.transforms[0].translation.z)  # First move up (z)
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(-180-aruco_rotation_degree[0])),
+													np.radians(self._origin_euler[1]+(0-aruco_rotation_degree[1])), 
+													np.radians(self._origin_euler[2]+(-90-aruco_rotation_degree[2])))  	
 				self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w = (quaternion[0],
 																										quaternion[1],
 																										quaternion[2],
@@ -173,14 +168,14 @@ class GenerateHandEyePoint(EventState):
                    																0.0)         # jump_threshold
 				self.plan_path.append(plan)
 				self.waypoints.clear()
-				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(45-aruco_rotation_degree[0])+15*self.eye_in_hand_mode),
-													np.radians(self._origin_euler[1]+(10-aruco_rotation_degree[1])), 
-													np.radians(self._origin_euler[2]))  	
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(-180-aruco_rotation_degree[0])+15*self.eye_in_hand_mode),
+													np.radians(self._origin_euler[1]+(0-aruco_rotation_degree[1])), 
+													np.radians(self._origin_euler[2]+(-90-aruco_rotation_degree[2])))  	
 				##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
-				self.wpose.position.x += self.cam_axis_x*self.move_distance*0.01
-				self.wpose.position.y -= self.cam_axis_y*self.move_distance*0.01
+				self.wpose.position.x += self.cam_axis_x*self.move_distance
+				self.wpose.position.y -= self.cam_axis_y*self.move_distance
 				for self.loop_num in range(self.loop_size):
-					self.wpose.position.y += self.cam_axis_y*0.035
+					self.wpose.position.y += self.cam_axis_y*(self.move_distance*2/self.loop_size)
 					self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w = (quaternion[0],
 																										quaternion[1],
 																										quaternion[2],
@@ -194,13 +189,13 @@ class GenerateHandEyePoint(EventState):
 					self.plan_path.append(plan)
 					self.waypoints.clear()
 					self.loop_num += 1
-				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(45-aruco_rotation_degree[0])),
-													np.radians(self._origin_euler[1]+(10-aruco_rotation_degree[1])), 
-													np.radians(self._origin_euler[2]))  	
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(-180-aruco_rotation_degree[0])),
+													np.radians(self._origin_euler[1]+(0-aruco_rotation_degree[1])+15), 
+													np.radians(self._origin_euler[2]+(-90-aruco_rotation_degree[2])))  	
 				##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 				
 				for self.loop_num in range(self.loop_size,self.loop_size*2):
-					self.wpose.position.x -= self.cam_axis_x*0.035
+					self.wpose.position.x -= self.cam_axis_x*(self.move_distance*2/self.loop_size)
 					self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w = (quaternion[0],
 																										quaternion[1],
 																										quaternion[2],
@@ -213,12 +208,12 @@ class GenerateHandEyePoint(EventState):
 					self.plan_path.append(plan)
 					self.waypoints.clear()
 					self.loop_num += 1
-				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(45-aruco_rotation_degree[0])-15*self.eye_in_hand_mode),
-													np.radians(self._origin_euler[1]+(10-aruco_rotation_degree[1])), 
-													np.radians(self._origin_euler[2]))  	
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(-180-aruco_rotation_degree[0])-15*self.eye_in_hand_mode),
+													np.radians(self._origin_euler[1]+(0-aruco_rotation_degree[1])), 
+													np.radians(self._origin_euler[2]+(-90-aruco_rotation_degree[2])))  	
 				##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 				for self.loop_num in range(self.loop_size*2,self.loop_size*3):
-					self.wpose.position.y -= self.cam_axis_y*0.035
+					self.wpose.position.y -= self.cam_axis_y*(self.move_distance*2/self.loop_size)
 					self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w = (quaternion[0],
 																										quaternion[1],
 																										quaternion[2],
@@ -231,12 +226,12 @@ class GenerateHandEyePoint(EventState):
 					self.plan_path.append(plan)
 					self.waypoints.clear()
 					self.loop_num += 1
-				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(45-aruco_rotation_degree[0])),
-													np.radians(self._origin_euler[1]+(10-aruco_rotation_degree[1])), 
-													np.radians(self._origin_euler[2]))  	
+				quaternion = quaternion_from_euler(np.radians(self._origin_euler[0]+(-180-aruco_rotation_degree[0])),
+													np.radians(self._origin_euler[1]+(0-aruco_rotation_degree[1])-15), 
+													np.radians(self._origin_euler[2]+(-90-aruco_rotation_degree[2])))  	
 				##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 				for self.loop_num in range(self.loop_size*3,self.points_num):
-					self.wpose.position.x += self.cam_axis_x*0.035
+					self.wpose.position.x += self.cam_axis_x*(self.move_distance*2/self.loop_size)
 					self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w = (quaternion[0],
 																										quaternion[1],
 																										quaternion[2],
@@ -253,6 +248,7 @@ class GenerateHandEyePoint(EventState):
 				
 				self.plan_path.append(self.plan_path[0])
 				userdata.hand_eye_points = self.plan_path
+				# print(userdata.hand_eye_points)
 		pass
 
 	def on_stop(self):
