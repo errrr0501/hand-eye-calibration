@@ -59,7 +59,7 @@ class MoveitHandEyeExecuteState(EventState):
 		self._execute_times = 0
 		self.plan, self.fraction =0,0
 
-	def on_start(self,userdata):
+	def on_start(self):
 		# self.points_num = np.size(userdata.hand_eye_points)
 		# print(np.size(userdata.hand_eye_points))
 		pass

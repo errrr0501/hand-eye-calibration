@@ -50,7 +50,7 @@ class CameraInfoPub(EventState):
 
 		try:
 
-			# rospy.init_node('camera_calibration_pub', anonymous=True)
+			rospy.init_node('camera_calibration_pub', anonymous=True)
 			   # rate = rospy.Rate(10) # 10hz
 			
 
@@ -86,7 +86,7 @@ class CameraInfoPub(EventState):
 		
 			self.pub_info.publish(self.camera_msg)
 
-
+			
 		except rospy.ROSInterruptException:
 			return "done"
 

@@ -16,6 +16,7 @@ set(${PROJECT_NAME}_CATKIN_COMPONENTS
     sensor_msgs
     tf2
     tf2_ros
+    message_generation
 )
 
 
@@ -28,6 +29,20 @@ find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 
+#######################################################################################################################
+## Generate services in the 'srv' folder
+#######################################################################################################################
+add_service_files(
+  FILES
+  eye2base.srv
+
+)
+
+generate_messages(
+   DEPENDENCIES
+   std_msgs 
+   geometry_msgs
+ )
 #######################################################################################################################
 ## catkin specific configuration
 #######################################################################################################################
