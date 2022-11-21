@@ -24,12 +24,16 @@ from charuco_detector.srv import eye2base, eye2baseRequest, eye2baseResponse
 class obj_info(dict):
 
     def __init__(self):
-        self['trans']      = [] 
-        self['pos]']       = []
-        self['euler']      = []
+        self['x']       = [] 
+        self['y']       = []
+        self['z']       = []
+        self['qw']      = []
+        self['qx']      = []
+        self['qy']      = []
+        self['qz']      = []
 
 
-class ObjTransToArm(EventState):
+class ObjTransToArmState(EventState):
 	"""
 	Output obj pose for arm.
 
@@ -43,7 +47,7 @@ class ObjTransToArm(EventState):
 		'''
 		Constructor
 		'''
-		super(ObjTransToArm, self).__init__(outcomes=['done', 'failed'],
+		super(ObjTransToArmState, self).__init__(outcomes=['done', 'failed'],
 											input_keys=['camera_h_charuco'],
 											output_keys=['obj_position'])
 		print(eye_in_hand_mode)
@@ -58,12 +62,15 @@ class ObjTransToArm(EventState):
 		self.First_charuco_array = []
 		self._origin_euler  = [0, 0, 0]
 
-		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','config/')
+		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','charuco_detector/','config/','hand_eye_calibration/')
 
 		self.pos2robot_service = '/eye_trans2base'
 		self.pos2robot_client = ProxyServiceCaller({self.pos2robot_service: eye2base})
 		self.pix2robot_service = '/pix2base'
 		self.pix2robot_client = ProxyServiceCaller({self.pix2robot_service: eye2base})
+
+		self.quaternion = []
+		self.excute_pos = []
 
 
 
@@ -75,6 +82,18 @@ class ObjTransToArm(EventState):
 		'''
 		Execute this state
 		'''
+
+		userdata.obj_position  = obj_info()
+		userdata.obj_position['x'].append(self.excute_pos[0])
+		userdata.obj_position['y'].append(self.excute_pos[1])
+		userdata.obj_position['z'].append(self.excute_pos[2])
+		userdata.obj_position['qx'].append(self.quaternion[0])
+		userdata.obj_position['qy'].append(self.quaternion[1])
+		userdata.obj_position['qz'].append(self.quaternion[2])
+		userdata.obj_position['qw'].append(self.quaternion[3])
+
+
+		print(userdata.obj_position)
 		return 'done'
 
 	def on_enter(self, userdata):
@@ -101,14 +120,14 @@ class ObjTransToArm(EventState):
 		# print(np.mat(obj_pose).reshape(4, 4))
 
 
-		aruco_rotation = [userdata.camera_h_charuco.transforms[0].rotation.x,
-								userdata.camera_h_charuco.transforms[0].rotation.y,
-								userdata.camera_h_charuco.transforms[0].rotation.z,
-								userdata.camera_h_charuco.transforms[0].rotation.w]
-		aruco_rotation_degree = list(euler_from_quaternion(aruco_rotation))
-		aruco_rotation_degree[0] = aruco_rotation_degree[0]/3.14*180
-		aruco_rotation_degree[1] = aruco_rotation_degree[1]/3.14*180
-		aruco_rotation_degree[2] = aruco_rotation_degree[2]/3.14*180
+		# aruco_rotation = [userdata.camera_h_charuco.transforms[0].rotation.x,
+		# 						userdata.camera_h_charuco.transforms[0].rotation.y,
+		# 						userdata.camera_h_charuco.transforms[0].rotation.z,
+		# 						userdata.camera_h_charuco.transforms[0].rotation.w]
+		# aruco_rotation_degree = list(euler_from_quaternion(aruco_rotation))
+		# aruco_rotation_degree[0] = aruco_rotation_degree[0]/3.14*180
+		# aruco_rotation_degree[1] = aruco_rotation_degree[1]/3.14*180
+		# aruco_rotation_degree[2] = aruco_rotation_degree[2]/3.14*180
 
 		config = configparser.ConfigParser()
 		config.optionxform = str 
@@ -134,15 +153,14 @@ class ObjTransToArm(EventState):
 		except rospy.ServiceException as e:
 			rospy.logerr("Service call failed: %s" % e)
 			return 'failed'
-		userdata.obj_position = obj_info()
-		userdata.obj_position['trans'] = res.trans
-		userdata.obj_position['pos]']  = res.pos
-		userdata.obj_position['euler'] = res.euler
+
+		print(res.euler)
+		# print(res.pos[0])
+		self.excute_pos = res.pos
+		self.quaternion = quaternion_from_euler(res.euler[0], res.euler[1], res.euler[2])
+		# print(self.quaternion)
 
 
-
-
-		print(userdata.obj_position)
 		
 		pass
 

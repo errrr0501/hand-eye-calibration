@@ -48,7 +48,9 @@ class ComputeCalibState(EventState):
 		config.optionxform = str #reference: http://docs.python.org/library/configparser.html
 		rospack = rospkg.RosPack()
 		curr_path = rospack.get_path('charuco_detector')
-		config.read(curr_path + '/config/ '+ self.calibration_file_name)
+		config.read(curr_path + '/config/'+ self.calibration_file_name)
+		# config.read(curr_path + '/config/hand_eye_calibration/'+ self.calibration_file_name)
+
         
 		config.add_section("hand_eye_calibration")
 		config.set("hand_eye_calibration", "x",  str(res.effector_camera.translation.x))

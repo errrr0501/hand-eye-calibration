@@ -8,8 +8,9 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from hand_eye_flexbe_states.get_ar_marker import GetArMarker
-from hand_eye_flexbe_states.obj_trans_to_arm import ObjTransToArm
+from hand_eye_flexbe_states.get_ar_marker import GetArMarkerState
+from hand_eye_flexbe_states.moveit_plan_excute import MoveitPlanExecuteState
+from hand_eye_flexbe_states.obj_trans_to_arm import ObjTransToArmState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -34,6 +35,8 @@ class verify_calibraionSM(Behavior):
 		self.add_parameter('eye_in_hand_mode', False)
 		self.add_parameter('base_link', '/base_link')
 		self.add_parameter('tip_link', '/tool0_controller')
+		self.add_parameter('group_name', 'manipulator')
+		self.add_parameter('reference_frame', 'base_link')
 
 		# references to used behaviors
 
@@ -59,17 +62,24 @@ class verify_calibraionSM(Behavior):
 		with _state_machine:
 			# x:193 y:98
 			OperatableStateMachine.add('get_obj_position',
-										GetArMarker(),
+										GetArMarkerState(),
 										transitions={'done': 'obj_to_arm_base', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco'})
 
 			# x:272 y:192
 			OperatableStateMachine.add('obj_to_arm_base',
-										ObjTransToArm(eye_in_hand_mode=self.eye_in_hand_mode, base_link=self.base_link, tip_link=self.tip_link),
-										transitions={'done': 'finished', 'failed': 'failed'},
+										ObjTransToArmState(eye_in_hand_mode=self.eye_in_hand_mode, base_link=self.base_link, tip_link=self.tip_link),
+										transitions={'done': 'excute_moveit_plan', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco', 'obj_position': 'obj_position'})
+
+			# x:323 y:408
+			OperatableStateMachine.add('excute_moveit_plan',
+										MoveitPlanExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
+										transitions={'received': 'excute_moveit_plan', 'done': 'finished', 'collision': 'failed'},
+										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'collision': Autonomy.Off},
+										remapping={'obj_position': 'obj_position', 'result_compute': 'result_compute'})
 
 
 		return _state_machine

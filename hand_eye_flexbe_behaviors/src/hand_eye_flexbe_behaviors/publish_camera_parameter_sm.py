@@ -8,7 +8,7 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from hand_eye_flexbe_states.camera_info_pub import CameraInfoPub
+from hand_eye_flexbe_states.camera_info_pub import CameraInfoPubState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -56,7 +56,7 @@ class publish_camera_parameterSM(Behavior):
 		with _state_machine:
 			# x:81 y:90
 			OperatableStateMachine.add('publish_camera_info',
-										CameraInfoPub(file_name=self.file_name),
+										CameraInfoPubState(file_name=self.file_name),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off})
 

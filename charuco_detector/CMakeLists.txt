@@ -29,6 +29,7 @@ find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 
 
+
 #######################################################################################################################
 ## Generate services in the 'srv' folder
 #######################################################################################################################
@@ -78,6 +79,7 @@ include_directories(
 )
 
 
+
 #==============================================================================
 # libraries
 #==============================================================================
@@ -100,9 +102,12 @@ add_executable(charuco_detector_node
 # library link
 #==============================================================================
 
-target_link_libraries(charuco_detector
+target_link_libraries(
+    charuco_detector
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
+    inih
+    #INIReader
 )
 
 

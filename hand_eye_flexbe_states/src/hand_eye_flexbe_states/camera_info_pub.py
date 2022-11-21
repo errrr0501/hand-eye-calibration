@@ -12,7 +12,7 @@ from sensor_msgs.msg import CameraInfo
 
 
 
-class CameraInfoPub(EventState):
+class CameraInfoPubState(EventState):
 	"""
 	Output a fixed pose to move.
 
@@ -23,7 +23,7 @@ class CameraInfoPub(EventState):
 	
 	def __init__(self, file_name):
 		"""Constructor"""
-		super(CameraInfoPub, self).__init__(outcomes=['done', 'failed'])
+		super(CameraInfoPubState, self).__init__(outcomes=['done', 'failed'])
 
 		self.camera_calibration_file = file_name
 		

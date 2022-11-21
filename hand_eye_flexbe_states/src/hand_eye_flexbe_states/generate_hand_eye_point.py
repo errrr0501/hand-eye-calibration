@@ -31,7 +31,7 @@ from flexbe_core.proxy import ProxyActionClient
 #         self['qy']      = []
 #         self['qz']      = []
 
-class GenerateHandEyePoint(EventState):
+class GenerateHandEyePointState(EventState):
 	"""
 	Output a fixed pose to move.
 
@@ -45,7 +45,7 @@ class GenerateHandEyePoint(EventState):
 		'''
 		Constructor
 		'''
-		super(GenerateHandEyePoint, self).__init__(outcomes=['done', 'failed'],
+		super(GenerateHandEyePointState, self).__init__(outcomes=['done', 'failed'],
 											input_keys=['camera_h_charuco'],
 											output_keys=['hand_eye_points'])
 		self.move_distance = float(move_distance)

@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 
-class TakePicture(EventState):
+class TakePictureState(EventState):
     """
     Output a fixed pose to move.
 
@@ -20,14 +20,14 @@ class TakePicture(EventState):
     
     def __init__(self, pic_num, camera_type):
         """Constructor"""
-        super(TakePicture, self).__init__(outcomes=['done', 'failed'])
+        super(TakePictureState, self).__init__(outcomes=['done', 'failed'])
         self.excu_num = 1
         self.pic_num = pic_num
         if camera_type == 'realsense':
             # Configure depth and color streams
             self.pipeline = rs.pipeline()
             self.config = rs.config()
-            self.config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+            # self.config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
             self.config.enable_stream(rs.stream.color, 1920, 1080, rs.format.bgr8, 30)
 
             # Start streaming
@@ -42,7 +42,7 @@ class TakePicture(EventState):
         self.preset_name = ""
         self.capture = cv2.VideoCapture(1)
 
-        self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','config','pic')
+        self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','charuco_detector/','config/','camera_calibration/','pic/')
     
 
 
@@ -87,7 +87,7 @@ class TakePicture(EventState):
             if key  == 13 : #enter
                 print("----------------------------------------------")
                 # cv2.imwrite("./../../../config/pic/camera-pic-of-charucoboard-"+str(self.excu_num)+".jpg",images)
-                cv2.imwrite(self.save_pwd+"/camera-pic-of-charucoboard-"+str(self.excu_num)+".jpg",images)
+                cv2.imwrite(self.save_pwd+"camera-pic-of-charucoboard-"+str(self.excu_num)+".jpg",images)
                 self.excu_num += 1
             #cv2.imshow('frame', frame)
             elif key & 0xFF == ord('q')or key == 27: # q or esc

@@ -8,8 +8,8 @@
 ###########################################################
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
-from hand_eye_flexbe_states.charuco_camera_calibration import CharucoCameraCalibration
-from hand_eye_flexbe_states.take_picture import TakePicture
+from hand_eye_flexbe_states.charuco_camera_calibration import CharucoCameraCalibrationState
+from hand_eye_flexbe_states.take_picture import TakePictureState
 # Additional imports can be added inside the following tags
 # [MANUAL_IMPORT]
 
@@ -63,13 +63,13 @@ class camera_calibrationSM(Behavior):
 		with _state_machine:
 			# x:149 y:88
 			OperatableStateMachine.add('take_camera_cali_pic',
-										TakePicture(pic_num=self.pic_num, camera_type=self.camera_type),
+										TakePictureState(pic_num=self.pic_num, camera_type=self.camera_type),
 										transitions={'done': 'camera_calibration', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off})
 
 			# x:348 y:87
 			OperatableStateMachine.add('camera_calibration',
-										CharucoCameraCalibration(square_size=self.square_size, marker_size=self.marker_size, col_count=self.col_count, row_count=self.row_count, save_file_name=self.save_file_name),
+										CharucoCameraCalibrationState(square_size=self.square_size, marker_size=self.marker_size, col_count=self.col_count, row_count=self.row_count, save_file_name=self.save_file_name),
 										transitions={'done': 'finished', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off})
 

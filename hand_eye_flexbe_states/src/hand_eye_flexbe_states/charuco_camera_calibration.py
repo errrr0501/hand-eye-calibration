@@ -10,7 +10,7 @@ import glob,os
 import configparser
 from sensor_msgs.msg import CameraInfo
 
-class CharucoCameraCalibration(EventState):
+class CharucoCameraCalibrationState(EventState):
 	"""
 	Output a fixed pose to move.
 
@@ -21,7 +21,7 @@ class CharucoCameraCalibration(EventState):
 	
 	def __init__(self, square_size, marker_size, col_count, row_count, save_file_name):
 		"""Constructor"""
-		super(CharucoCameraCalibration, self).__init__(outcomes=['done', 'failed'])
+		super(CharucoCameraCalibrationState, self).__init__(outcomes=['done', 'failed'])
 		self.camera_calibration_file = save_file_name
 		
 		self.CHARUCOBOARD_COLCOUNT = col_count
@@ -42,7 +42,7 @@ class CharucoCameraCalibration(EventState):
 		self.corners_all = [] # Corners discovered in all images processed
 		self.ids_all = [] # Aruco ids corresponding to corners discovered
 		self.image_size = None # Determined at runtime
-		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','config/')
+		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','charuco_detector/','config/','camera_calibration/')
 
 
 		self.images = glob.glob(self.save_pwd + 'pic/camera-pic-of-charucoboard-*.jpg')
@@ -92,7 +92,7 @@ class CharucoCameraCalibration(EventState):
 					self.image_size = gray.shape[::-1]
 
 				# Reproportion the image, maxing width or height at 1000
-				proportion = max(img.shape) / 1280.0
+				proportion = max(img.shape) / 1920.0
 				img = cv2.resize(img, (int(img.shape[1]/proportion), int(img.shape[0]/proportion)))
 				# Pause to display each image, waiting for key press
 				cv2.imshow('Charuco board', img)
@@ -102,7 +102,7 @@ class CharucoCameraCalibration(EventState):
 
 		# Destroy any open CV windows
 		cv2.destroyAllWindows()
-
+		print("==========================================================================")
 		# Make sure at least one image was found
 		if len(self.images) < 1:
 			# Calibration failed because there were no images, warn the user
@@ -120,6 +120,7 @@ class CharucoCameraCalibration(EventState):
 
 		# Now that we've seen all of our images, perform the camera calibration
 		# based on the set of points we've discovered
+		# print("==========================================================================")
 		calibration, cameraMatrix, distCoeffs, rvecs, tvecs = aruco.calibrateCameraCharuco(
 				charucoCorners=self.corners_all,
 				charucoIds=self.ids_all,
@@ -129,6 +130,8 @@ class CharucoCameraCalibration(EventState):
 				distCoeffs=None)
 
 		# Print matrix and distortion coefficient to the console
+		# print("==========================================================================")
+
 		print("-----------------------------------------------------")
 		print(cameraMatrix)
 		print(distCoeffs)

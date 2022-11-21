@@ -6,7 +6,7 @@ from geometry_msgs.msg import Transform
 from visp_hand2eye_calibration.msg import TransformArray
 import time
 
-class GetArMarker(EventState):
+class GetArMarkerState(EventState):
 	"""
 	Output a fixed pose to move.
 
@@ -17,7 +17,7 @@ class GetArMarker(EventState):
 	
 	def __init__(self):
 		"""Constructor"""
-		super(GetArMarker, self).__init__(outcomes=['done', 'failed'], 
+		super(GetArMarkerState, self).__init__(outcomes=['done', 'failed'], 
 											   output_keys=['camera_h_charuco'])
 		# self.base_link = base_link
 		# self.tip_link = tip_link

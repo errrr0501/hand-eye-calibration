@@ -10,8 +10,8 @@
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from hand_eye_flexbe_states.compute_calib import ComputeCalibState
 from hand_eye_flexbe_states.find_charuco import FindCharucoState
-from hand_eye_flexbe_states.generate_hand_eye_point import GenerateHandEyePoint
-from hand_eye_flexbe_states.initial_pose import InitialPose
+from hand_eye_flexbe_states.generate_hand_eye_point import GenerateHandEyePointState
+from hand_eye_flexbe_states.initial_pose import InitialPoseState
 from hand_eye_flexbe_states.move_robot_manually import MoveRobotManuallyState
 from hand_eye_flexbe_states.moveit_hand_eye_excute import MoveitHandEyeExecuteState
 # Additional imports can be added inside the following tags
@@ -101,7 +101,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 			# x:83 y:243
 			OperatableStateMachine.add('Generate_Points',
-										GenerateHandEyePoint(eye_in_hand_mode=self.eye_in_hand, base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num, cam_x=self.cam_x, cam_y=self.cam_y, cam_z=self.cam_z, axis=self.axis),
+										GenerateHandEyePointState(eye_in_hand_mode=self.eye_in_hand, base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num, cam_x=self.cam_x, cam_y=self.cam_y, cam_z=self.cam_z, axis=self.axis),
 										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points'})
@@ -115,7 +115,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 			# x:356 y:325
 			OperatableStateMachine.add('Back_to_Initial_Pose',
-										InitialPose(group_name=self.group_name, reference_frame=self.reference_frame),
+										InitialPoseState(group_name=self.group_name, reference_frame=self.reference_frame),
 										transitions={'done': 'finished', 'collision': 'failed'},
 										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off})
 

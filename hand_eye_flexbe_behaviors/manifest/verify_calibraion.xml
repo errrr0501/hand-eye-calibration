@@ -22,6 +22,10 @@
 
 		<param type="text" name="tip_link" default="/tool0_controller" label="tip_link" hint="Sets the tip_link" />
 
+		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
+
+		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />
+
 	</params>
 
 

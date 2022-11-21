@@ -17,8 +17,8 @@ from geometry_msgs.msg import Transform
 
 class HandEyeTrans:
 	def __init__(self, base_link, tip_link):
-		self.save_camera_cali_pwd = os.path.join(os.path.dirname(__file__), '..','..','config/')
-		self.hand_eye_cali_pwd = os.path.join(os.path.dirname(__file__), '..','config/')
+		self.save_camera_cali_pwd = os.path.join(os.path.dirname(__file__), '..','config/','camera_calibration/')
+		self.hand_eye_cali_pwd = os.path.join(os.path.dirname(__file__), '..','config/','hand_eye_calibration/')
 
 		self.base_link = base_link
 		self.tip_link = tip_link
@@ -146,9 +146,12 @@ class HandEyeTrans:
 
 	def __rotation2rpy(self, rotation):
 		_rpy = []
-		_rpy.append(degrees(asin(rotation[1, 2])))
-		_rpy.append(degrees(atan2(rotation[0, 2], -rotation[2, 2])))
-		_rpy.append(degrees(atan2(-rotation[1, 0], -rotation[1, 1])))
+		_pitch = degrees(asin(rotation[1, 2]))
+		_roll = degrees(atan2(rotation[0, 2], -rotation[2, 2]))
+		_yaw = degrees(atan2(-rotation[1, 0], -rotation[1, 1]))
+		_rpy.append(_roll)
+		_rpy.append(_pitch)
+		_rpy.append(_yaw)
 		return _rpy
 		
 	def __eye2base_transform(self, req):

@@ -23,7 +23,7 @@ Created on 15.06.2015
 @author: Philipp Schillinger
 '''
 
-class InitialPose(EventState):
+class InitialPoseState(EventState):
 	'''
 	Move robot by planned trajectory.
 
@@ -41,7 +41,7 @@ class InitialPose(EventState):
 		'''
 		Constructor
 		'''
-		super(InitialPose, self).__init__(outcomes=['done', 'collision'])
+		super(InitialPoseState, self).__init__(outcomes=['done', 'collision'])
 		# group_name = ""
 		self._group_name = group_name
 		self._reference_frame = reference_frame
