@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import configparser
+import configparser,os
 import rospkg
 import numpy as np
 import tf
@@ -9,6 +9,7 @@ from visp_hand2eye_calibration.msg import TransformArray
 from flexbe_core import EventState
 from flexbe_core.proxy import ProxyServiceCaller
 from visp_hand2eye_calibration.srv import compute_effector_camera_quick, compute_effector_camera_quickRequest
+
 
 class ComputeCalibState(EventState):
 	"""
@@ -27,40 +28,40 @@ class ComputeCalibState(EventState):
 		self.camera_object_list = TransformArray()
 		self.world_effector_list = TransformArray()
 		self.calib_compute_client = ProxyServiceCaller({'/compute_effector_camera_quick': compute_effector_camera_quick})
-    
+		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','charuco_detector/','config/','hand_eye_calibration/')
+
+	
 	def execute(self, userdata):
 		req = compute_effector_camera_quickRequest(self.camera_object_list, self.world_effector_list)
-		print("^^^^^^^^^^^^^^^^^^^")
-		# print(req.camera_object)
-		# print(req.world_effector)
 		print ("========================================================================================================")
 		res = self.calib_compute_client.call('/compute_effector_camera_quick', req)
 		
 		print('x = '  + str(res.effector_camera.translation.x))
 		print('y = '  + str(res.effector_camera.translation.y))
 		print('z = '  + str(res.effector_camera.translation.z))
-		print('qw = ' + str(res.effector_camera.rotation.w))
 		print('qx = ' + str(res.effector_camera.rotation.x))
 		print('qy = ' + str(res.effector_camera.rotation.y))
 		print('qz = ' + str(res.effector_camera.rotation.z))
+		print('qw = ' + str(res.effector_camera.rotation.w))
 
 		config = configparser.ConfigParser()
 		config.optionxform = str #reference: http://docs.python.org/library/configparser.html
-		rospack = rospkg.RosPack()
-		curr_path = rospack.get_path('charuco_detector')
-		config.read(curr_path + '/config/'+ self.calibration_file_name)
+		config.read(self.save_pwd + self.calibration_file_name)
 		# config.read(curr_path + '/config/hand_eye_calibration/'+ self.calibration_file_name)
 
-        
-		config.add_section("hand_eye_calibration")
+		if config.get("hand_eye_calibration" ,"x") != None:
+			pass
+		else:
+			config.add_section("hand_eye_calibration")
 		config.set("hand_eye_calibration", "x",  str(res.effector_camera.translation.x))
 		config.set("hand_eye_calibration", "y",  str(res.effector_camera.translation.y))
 		config.set("hand_eye_calibration", "z",  str(res.effector_camera.translation.z))
-		config.set("hand_eye_calibration", "qw", str(res.effector_camera.rotation.w))
 		config.set("hand_eye_calibration", "qx", str(res.effector_camera.rotation.x))
 		config.set("hand_eye_calibration", "qy", str(res.effector_camera.rotation.y))
 		config.set("hand_eye_calibration", "qz", str(res.effector_camera.rotation.z))
-		with open(curr_path + '/config/'+ self.calibration_file_name, 'w') as file:
+		config.set("hand_eye_calibration", "qw", str(res.effector_camera.rotation.w))
+
+		with open(self.save_pwd+ self.calibration_file_name, 'w') as file:
 			config.write(file)
 		return 'finish'
 	

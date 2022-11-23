@@ -27,10 +27,10 @@ class obj_info(dict):
         self['x']       = [] 
         self['y']       = []
         self['z']       = []
-        self['qw']      = []
         self['qx']      = []
         self['qy']      = []
         self['qz']      = []
+        self['qw']      = []
 
 
 class ObjTransToArmState(EventState):
@@ -50,7 +50,6 @@ class ObjTransToArmState(EventState):
 		super(ObjTransToArmState, self).__init__(outcomes=['done', 'failed'],
 											input_keys=['camera_h_charuco'],
 											output_keys=['obj_position'])
-		print(eye_in_hand_mode)
 		if eye_in_hand_mode:
 			self.eye_in_hand_mode = 1
 		else:
@@ -64,10 +63,13 @@ class ObjTransToArmState(EventState):
 
 		self.save_pwd = os.path.join(os.path.dirname(__file__), '..','..','..','charuco_detector/','config/','hand_eye_calibration/')
 
-		self.pos2robot_service = '/eye_trans2base'
+		self.trans2robot_service = '/eye_trans2base'
+		self.trans2robot_client = ProxyServiceCaller({self.trans2robot_service: eye2base})
+		self.pos2robot_service = '/eye2base'
 		self.pos2robot_client = ProxyServiceCaller({self.pos2robot_service: eye2base})
 		self.pix2robot_service = '/pix2base'
 		self.pix2robot_client = ProxyServiceCaller({self.pix2robot_service: eye2base})
+
 
 		self.quaternion = []
 		self.excute_pos = []
@@ -99,22 +101,85 @@ class ObjTransToArmState(EventState):
 	def on_enter(self, userdata):
 
 
+
+
+		origindegree = list(euler_from_quaternion([userdata.camera_h_charuco.transforms[0].rotation.x, 
+													userdata.camera_h_charuco.transforms[0].rotation.y, 
+													userdata.camera_h_charuco.transforms[0].rotation.z, 
+													userdata.camera_h_charuco.transforms[0].rotation.w]))
+		origindegree[0] = origindegree[0]/3.14*180.0
+		origindegree[1] = origindegree[1]/3.14*180.0
+		origindegree[2] = origindegree[2]/3.14*180.0
+		print(origindegree)
+		# quaternion = quaternion_from_euler(np.radians(180+origindegree[0]),
+		# 									np.radians(origindegree[1]), 
+		# 									np.radians(180+origindegree[2]))
+		quaternion = quaternion_from_euler(np.radians(-180-origindegree[0]),
+											np.radians(-origindegree[1]), 
+											np.radians(-180-origindegree[2]))
+
+		
 		obj_pose = self.tf_listener.fromTranslationRotation((userdata.camera_h_charuco.transforms[0].translation.x,
 															userdata.camera_h_charuco.transforms[0].translation.y,
 															userdata.camera_h_charuco.transforms[0].translation.z)
-															,(userdata.camera_h_charuco.transforms[0].rotation.x,
-															userdata.camera_h_charuco.transforms[0].rotation.y,
-															userdata.camera_h_charuco.transforms[0].rotation.z,
-															userdata.camera_h_charuco.transforms[0].rotation.w))
-		# obj_pose_list = []
-		print(obj_pose)
+															,(quaternion[0],
+															quaternion[1],
+															quaternion[2],
+															quaternion[3]))
+
+		# obj_pose = self.tf_listener.fromTranslationRotation((userdata.camera_h_charuco.transforms[0].translation.x,
+		# 													userdata.camera_h_charuco.transforms[0].translation.y,
+		# 													userdata.camera_h_charuco.transforms[0].translation.z)
+		# 													,(userdata.camera_h_charuco.transforms[0].rotation.x,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.y,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.z,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.w))
+
+		# quaternion = quaternion_from_euler(np.radians(-180),
+		# 									np.radians(0), 
+		# 									np.radians(0))  
+		# rotation_matrix = tf.transformations.quaternion_matrix(quaternion)
+
+		# quaternion2 = quaternion_from_euler(np.radians(0),
+		# 									np.radians(0), 
+		# 									np.radians(-180))  
+
+		# rotation_matrix2 = tf.transformations.quaternion_matrix(quaternion2)
+
+		# rotation_mat =  rotation_matrix * rotation_matrix2
+
+		# # obj_pose = obj_pose * rotation_mat
+		# obj_pose = rotation_mat * obj_pose 
+
+		# obj_pose = [userdata.camera_h_charuco.transforms[0].translation.x, 
+		# 			userdata.camera_h_charuco.transforms[0].translation.y,
+		# 			userdata.camera_h_charuco.transforms[0].translation.z]
+										
+		# print(obj_pose)
 		# self.vector(obj_pose)
 		# obj_pose = np.float_(obj_pose).tolist()
 		# for i in obj_pose:
 		# 	obj_pose_list.append(i) 
 		obj_pose = obj_pose.flatten().tolist()
+		# print(obj_pose)
+
+
+		# origindegree = list(euler_from_quaternion([userdata.camera_h_charuco.transforms[0].rotation.x,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.y,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.z,
+		# 													userdata.camera_h_charuco.transforms[0].rotation.w]))
+		# # origindegree = origindegree/3.14*180.0
+		# origindegree[0] = origindegree[0]/3.14*180.0
+		# origindegree[1] = origindegree[1]/3.14*180.0
+		# origindegree[2] = origindegree[2]/3.14*180.0
+		# print(origindegree)
+
+		# quaternion = quaternion_from_euler(0,0,0)
+		# print(quaternion)
+
+
 		# obj_pose = [float(i) for i in obj_pose]
-		print(obj_pose)
+		# print(obj_pose)
 		# assert len(obj_pose) == 16
 
 		# print(np.mat(obj_pose).reshape(4, 4))
@@ -149,16 +214,26 @@ class ObjTransToArmState(EventState):
 		req.ini_pose = obj_pose
 
 		try:
-			res = self.pos2robot_client.call(self.pos2robot_service, req)
+			res = self.trans2robot_client.call(self.trans2robot_service, req)
 		except rospy.ServiceException as e:
 			rospy.logerr("Service call failed: %s" % e)
 			return 'failed'
 
-		print(res.euler)
+		# print(res)
 		# print(res.pos[0])
+		# print(res)
 		self.excute_pos = res.pos
-		self.quaternion = quaternion_from_euler(res.euler[0], res.euler[1], res.euler[2])
-		# print(self.quaternion)
+		# self.quaternion = quaternion_from_euler(res.euler[0], res.euler[1], res.euler[2])
+		# self.quaternion = [res.quat[0], res.quat[1], res.quat[2], res.quat[3]]
+		self.quaternion = [res.quat[0], res.quat[1], res.quat[2], res.quat[3]]
+
+		origindegree = list(euler_from_quaternion(self.quaternion))
+		# origindegree = origindegree/3.14*180.0
+		origindegree[0] = origindegree[0]/3.14*180.0
+		origindegree[1] = origindegree[1]/3.14*180.0
+		origindegree[2] = origindegree[2]/3.14*180.0
+
+		print(origindegree)
 
 
 		

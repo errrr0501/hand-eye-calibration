@@ -167,9 +167,9 @@ class CharucoCameraCalibrationState(EventState):
 		# f = open(self.save_pwd+'/calibration.pckl', 'wb')
 		# pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
 		# f.close()
-		f = open(self.save_pwd+'/calibration.yaml', 'wb')
-		pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
-		f.close()
+		# f = open(self.save_pwd+'/calibration.yaml', 'wb')
+		# pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
+		# f.close()
 
 
 		# Print to console our success

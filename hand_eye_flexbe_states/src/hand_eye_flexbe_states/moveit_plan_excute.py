@@ -84,10 +84,11 @@ class MoveitPlanExecuteState(EventState):
 		pose_goal = geometry_msgs.msg.Pose()
 		pose_goal.position.x = userdata.obj_position["x"][self._execute_times]
 		pose_goal.position.y = userdata.obj_position["y"][self._execute_times]
-		# pose_goal.position.z = userdata.obj_position["z"][self._execute_times]
+		# pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.16265
+		pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.17265
 		# pose_goal.position.x = self._first_pose.pose.position.x
 		# pose_goal.position.y = self._first_pose.pose.position.y
-		pose_goal.position.z = self._first_pose.pose.position.z
+		# pose_goal.position.z = self._first_pose.pose.position.z
 
 
 		pose_goal.orientation.x = userdata.obj_position["qx"][self._execute_times]
@@ -105,6 +106,10 @@ class MoveitPlanExecuteState(EventState):
 		self._move_group.clear_pose_targets()
 
 		userdata.result_compute = self._execute_times >= self.points_num
+
+		# if userdata.result_compute:
+		# 	return 'done'
+
 		# print("==================================================================")
 		# print(userdata.result_compute)
 		# print("==================================================================")
@@ -113,15 +118,14 @@ class MoveitPlanExecuteState(EventState):
 
 
 		# current_pose = self._move_group.get_current_pose()
-		# print("current pose",current_pose)
+		# cprint("current pose",current_pose)
 
-		if userdata.result_compute:
-			return 'done'
+
 
 		if self._result == MoveItErrorCodes.SUCCESS:
 			self._execute_times += 1
 			# print(self.execute_num)
-			return 'received'
+			return 'done'
 			
 		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
 			return 'collision'
@@ -129,9 +133,8 @@ class MoveitPlanExecuteState(EventState):
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
-		if self._execute_times == 0:
+		if self._execute_times <= 0:
 			self.points_num  = self.points_num + np.size(userdata.obj_position["x"])
-
 		pass
 
 	def on_stop(self):

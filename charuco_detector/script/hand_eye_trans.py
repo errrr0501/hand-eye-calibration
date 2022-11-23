@@ -9,9 +9,7 @@ from math import asin, atan2, degrees, pi
 from charuco_detector.srv import eye2base, eye2baseResponse
 from visp_hand2eye_calibration.msg import TransformArray
 from geometry_msgs.msg import Transform
-
-# from tf.listener import TransformerROS
-#  tf.TransformerROS
+from scipy.spatial.transform import Rotation as R
 
 
 
@@ -29,15 +27,12 @@ class HandEyeTrans:
 		self.camera_h_charuco.header.frame_id = 'calib_camera'
 		self._rtool_tool_trans = np.mat(np.identity(4))
 
-
 		self._img_pose = np.zeros(6)
 		self._base_pose = np.zeros(6)
 		self._curr_pose = np.zeros(6)
 		self._tool_coor = np.zeros(6)
 		self._base_coor = np.zeros(6)
 		self._base_tool_trans =  np.mat(np.identity(4))
-		# self._rbase_base_trans = np.mat(np.identity(4))
-		# self._rtool_tool_trans = np.mat(np.identity(4))
 		self._hand_eye_trans =   np.mat(np.identity(4))
 		self._rtool_eye_trans, self._camera_mat = self.__get_camera_param()
 
@@ -98,14 +93,7 @@ class HandEyeTrans:
 		qw = float(config.get("hand_eye_calibration", "qw"))
 
 
-		trans = Transform()
-		trans.translation.x = x 
-		trans.translation.y = y
-		trans.translation.z = z
-		trans.rotation.x = qx
-		trans.rotation.y = qy
-		trans.rotation.z = qz
-		trans.rotation.w = qw
+
 		# tool_eye_trans = self.tf_listener.fromTranslationRotation(trans.translation,trans.rotation)
 		tool_eye_trans = self.tf_listener.fromTranslationRotation((x,y,z),(qx,qy,qz,qw))
 		print(tool_eye_trans)
@@ -141,18 +129,48 @@ class HandEyeTrans:
 		self._base_tool_trans = self.tf_listener.fromTranslationRotation((trans.translation.x,trans.translation.y,trans.translation.z),
 																		(trans.rotation.x,trans.rotation.y,trans.rotation.z,trans.rotation.w))
 			
-		self._base_tool_trans = np.mat(self._base_tool_trans).reshape(4, 4)
+		# self._base_tool_trans = np.mat(self._base_tool_trans).reshape(4, 4)
 		return
 
-	def __rotation2rpy(self, rotation):
+	def __rotation2quat(self, rotation):
 		_rpy = []
-		_pitch = degrees(asin(rotation[1, 2]))
-		_roll = degrees(atan2(rotation[0, 2], -rotation[2, 2]))
-		_yaw = degrees(atan2(-rotation[1, 0], -rotation[1, 1]))
-		_rpy.append(_roll)
-		_rpy.append(_pitch)
-		_rpy.append(_yaw)
-		return _rpy
+		print(rotation)
+		# print(rotation[0,1])
+		###################################################################
+		# theta1 = np.arctan(rotation[1, 0] / rotation[0, 0])
+		# theta2 = np.arctan(-rotation[2, 0] * np.cos(theta1) / rotation[0, 0])
+		# theta3 = np.arctan(rotation[2, 1] / rotation[2, 2])
+		# theta1 = theta1 * 180 / np.pi
+		# theta2 = theta2 * 180 / np.pi
+		# theta3 = theta3 * 180 / np.pi
+		# _rpy.append(theta1)
+		# _rpy.append(theta2)
+		# _rpy.append(theta3)
+		##################################################################
+		# _pitch = degrees(asin(rotation[1, 2]))
+		# _roll = degrees(atan2(rotation[0, 2], -rotation[2, 2]))
+		# _yaw = degrees(atan2(-rotation[1, 0], -rotation[1, 1]))
+		# _rpy.append(_roll)
+		# _rpy.append(_pitch)
+		# _rpy.append(_yaw)
+		##################################################################
+		# quat_result = R.from_matrix([[rotation[0,0], rotation[0,1], rotation[0,2]],
+		#            							[rotation[1,0], rotation[1,1], rotation[1,2]],
+		#            							[rotation[2,0], rotation[2,1], rotation[2,2]]]).as_quat()
+		# quat_result = np.array(quat_result).reshape(-1)
+		###############################################################################
+		# qw = np.math.sqrt(float(1)+rotation[0,0]+rotation[1,1]+rotation[2,2])*0.5
+		# qx = (rotation[2,1]-rotation[1,2])/(4*qw)
+		# qy = (rotation[0,2]-rotation[2,0])/(4*qw)
+		# qz = (rotation[1,0]-rotation[0,1])/(4*qw)
+		# quat_result = [qx,qy,qz,qw]
+		#################################################################################################
+		quat_result = tf.transformations.quaternion_from_matrix(rotation)
+		####################################################################################################
+
+		print("---------------------------------")
+		print(quat_result)
+		return quat_result
 		
 	def __eye2base_transform(self, req):
 		self.__get_robot_trans()
@@ -160,22 +178,32 @@ class HandEyeTrans:
 		eye_obj_trans = np.mat(np.append(np.array(req.ini_pose), 1)).reshape(4, 1)
 		# eye_obj_trans[:3] = np.multiply(eye_obj_trans[:3], 0.01)
 		result = self._base_tool_trans * np.linalg.inv(self._rtool_tool_trans) * self._rtool_eye_trans * eye_obj_trans
+		print(result)
 		res = eye2baseResponse()
 		res.trans = np.mat(np.identity(4))
-		res.trans[2, :] = result 
+		res.trans[2, :] = result.flatten()
+		print(res.trans)
+		res.trans = np.squeeze(np.asarray(res.trans))
+		# res.trans = np.array(res.trans.T)
+		
 		res.pos = np.array(result[:3]).reshape(-1)
-		res.euler = self.__rotation2rpy(res.trans)
+		res.quat = self.__rotation2quat(res.trans)
+		res.trans = []
 		return res
 
 	def __eye_trans2base_transform(self, req):
 		self.__get_robot_trans()
 		assert len(req.ini_pose) == 16
 		eye_obj_trans = np.mat(req.ini_pose).reshape(4, 4)
+		# result = self._base_tool_trans *  self._rtool_eye_trans * eye_obj_trans
+		# result = eye_obj_trans * self._rtool_eye_trans * self._base_tool_trans
 		result = self._base_tool_trans * np.linalg.inv(self._rtool_tool_trans) * self._rtool_eye_trans * eye_obj_trans
+		# result = eye_obj_trans * self._rtool_eye_trans * np.linalg.inv(self._rtool_tool_trans) * self._base_tool_trans
 		res = eye2baseResponse()
 		res.trans = np.array(result).reshape(-1)
 		res.pos = np.array(result[0:3, 3]).reshape(-1)
-		res.euler = self.__rotation2rpy(result)
+		res.quat = self.__rotation2quat(result)
+		# res.quat = self.__rotation2quat(result[0:3,0:3])
 		return res
 		
 
@@ -191,7 +219,7 @@ class HandEyeTrans:
 		res.trans = np.mat(np.identity(4))
 		res.trans[2, :] = result
 		res.pos = np.array(result[:3]).reshape(-1)
-		res.euler = self.__rotation2rpy(res.trans)
+		res.quat = self.__rotation2quat(res.trans)
 		return res
 
 if __name__ == "__main__":
