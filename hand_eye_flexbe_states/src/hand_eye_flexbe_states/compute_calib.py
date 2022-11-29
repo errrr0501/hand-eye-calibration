@@ -20,11 +20,17 @@ class ComputeCalibState(EventState):
 
 	"""
 	
-	def __init__(self, eye_in_hand_mode, calibration_file_name):
+	def __init__(self, eye_in_hand_mode, calibration_file_name, customize_file):
 		"""Constructor"""
 		super(ComputeCalibState, self).__init__(outcomes=['finish'], input_keys=['base_h_tool', 'camera_h_charuco'])
 		self.eye_in_hand_mode = eye_in_hand_mode
-		self.calibration_file_name = str(calibration_file_name)
+		if customize_file:
+			self.calibration_file_name = str(calibration_file_name)
+		else:
+			if eye_in_hand_mode:
+				self.calibration_file_name = "eye_in_hand_calibration.ini"
+			else:
+				self.calibration_file_name = "eye_to_hand_calibration.ini"
 		self.camera_object_list = TransformArray()
 		self.world_effector_list = TransformArray()
 		self.calib_compute_client = ProxyServiceCaller({'/compute_effector_camera_quick': compute_effector_camera_quick})
@@ -66,16 +72,19 @@ class ComputeCalibState(EventState):
 		return 'finish'
 	
 	def on_enter(self, userdata):
-		self.camera_object_list = userdata.camera_h_charuco
-		# print(self.camera_object_list)
 		if self.eye_in_hand_mode:
 			print("------------------------------------------------------------------")
 			self.world_effector_list = userdata.base_h_tool
+			self.camera_object_list = userdata.camera_h_charuco
+			# print(self.camera_object_list)
 			# print(self.world_effector_list)
 		else:
 			self.world_effector_list.header = userdata.base_h_tool.header
 			print ("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 			print (userdata.base_h_tool)
+
+			self.camera_object_list.header = userdata.camera_h_charuco.header
+
 			for transform in userdata.base_h_tool.transforms:
 				trans = tf.transformations.quaternion_matrix([transform.rotation.x, transform.rotation.y,
 															  transform.rotation.z, transform.rotation.w])
@@ -86,3 +95,15 @@ class ComputeCalibState(EventState):
 				trans_B.rotation.x, trans_B.rotation.y, trans_B.rotation.z, \
 					trans_B.rotation.w = tf.transformations.quaternion_from_matrix(trans)
 				self.world_effector_list.transforms.append(trans_B)
+
+			for transform in userdata.camera_h_charuco.transforms:
+				trans = tf.transformations.quaternion_matrix([transform.rotation.x, transform.rotation.y,
+															  transform.rotation.z, transform.rotation.w])
+				trans[0:3, 3] = [transform.translation.x, transform.translation.y, transform.translation.z]
+				trans = tf.transformations.inverse_matrix(trans)
+				trans_C = Transform()
+				trans_C.translation.x, trans_C.translation.y, trans_C.translation.z = trans[:3, 3]
+				trans_C.rotation.x, trans_C.rotation.y, trans_C.rotation.z, \
+					trans_C.rotation.w = tf.transformations.quaternion_from_matrix(trans)
+				self.camera_object_list.transforms.append(trans_C)
+

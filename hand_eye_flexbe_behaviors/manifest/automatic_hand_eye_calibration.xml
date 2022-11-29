@@ -16,7 +16,9 @@
 	<!-- Available Parameters -->
 	<params>
 
-		<param type="boolean" name="eye_in_hand" default="False" label="eye_in_hand" hint="Sets the eye_in_hand" />
+		<param type="boolean" name="eye_in_hand_mode" default="False" label="eye_in_hand_mode" hint="Sets the eye_in_hand_mode" />
+
+		<param type="boolean" name="customize_file" default="False" label="customize_file" hint="Sets the customize_file" />
 
 		<param type="numeric" name="calib_pose_num" default="0" label="calib_pose_num" hint="Sets the calib_pose_num">
 			<min value="0" />
@@ -29,16 +31,16 @@
 
 		<param type="text" name="calibration_file_name" default="hand_eye_calibration.ini" label="calibration_file_name" hint="Sets the calibration_file_name" />
 
-		<param type="numeric" name="move_distance" default="0.1" label="move_distance" hint="Sets the move_distance">
+		<param type="numeric" name="move_distance" default="0.10" label="move_distance" hint="Sets the move_distance">
 			<min value="0" />
-			<max value="0.3" />
+			<max value="0.30" />
 		</param>
 
 		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />
 
 		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
 
-		<param type="text" name="axis" default="xyz" label="axis" hint="Sets the axis" />
+		<param type="text" name="axis" default="-yxz" label="axis" hint="Sets the axis" />
 
 		<param type="numeric" name="cam_x" default="1" label="cam_x" hint="Sets the cam_x">
 			<min value="-1" />

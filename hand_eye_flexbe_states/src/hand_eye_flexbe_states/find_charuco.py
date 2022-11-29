@@ -15,7 +15,7 @@ class FindCharucoState(EventState):
 
 	"""
 	
-	def __init__(self, base_link, tip_link):
+	def __init__(self, base_link, tip_link, eye_in_hand_mode):
 		"""Constructor"""
 		super(FindCharucoState, self).__init__(outcomes=['done', 'go_compute'], input_keys=['result_compute'], 
 											   output_keys=['base_h_tool', 'camera_h_charuco'])
@@ -27,6 +27,7 @@ class FindCharucoState(EventState):
 		self.base_h_tool.header.frame_id = self.base_link
 		self.camera_h_charuco.header.frame_id = 'calib_camera'
 		self.enter_time = rospy.Time.now()
+		self.eye_in_hand_mode = eye_in_hand_mode
 
 	def execute(self, userdata):
 		time.sleep(1.5)
@@ -34,17 +35,30 @@ class FindCharucoState(EventState):
 			rospy.logwarn('Can not get charuco board pose, abandon this position')
 			return 'done'
 
+
+		if self.eye_in_hand_mode:
+			try:
+				(camera_trans_charuco, camera_rot_charuco) = self.tf_listener.lookupTransform('/calib_camera', '/calib_charuco', rospy.Time.now())
+			except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+				rospy.logwarn('lookupTransform for charuco failed!')
+				return
+		else:
+			try:
+				(camera_trans_charuco, camera_rot_charuco) = self.tf_listener.lookupTransform('/calib_charuco', '/calib_camera', rospy.Time.now())
+			except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+				rospy.logwarn('lookupTransform for charuco failed!')
+				return
 		try:
 			(base_trans_tool, base_rot_tool) = self.tf_listener.lookupTransform(self.base_link, self.tip_link, rospy.Time(0))
 		except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
 			rospy.logwarn('lookupTransform for robot failed!, ' + self.base_link + ', ' + self.tip_link)
 			return
 
-		try:
-			(camera_trans_charuco, camera_rot_charuco) = self.tf_listener.lookupTransform('/calib_camera', '/calib_charuco', rospy.Time.now())
-		except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-			rospy.logwarn('lookupTransform for charuco failed!')
-			return
+		# try:
+		# 	(camera_trans_charuco, camera_rot_charuco) = self.tf_listener.lookupTransform('/calib_camera', '/calib_charuco', rospy.Time.now())
+		# except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+		# 	rospy.logwarn('lookupTransform for charuco failed!')
+		# 	return
 
 		trans = Transform()
 		trans.translation.x = camera_trans_charuco[0]

@@ -7,7 +7,6 @@ from moveit_msgs.msg import MoveItErrorCodes
 from math import pi, radians
 from std_msgs.msg import String
 import geometry_msgs.msg
-from moveit_commander.conversions import pose_to_list
 from tf import transformations as tf
 
 from flexbe_core import EventState, Logger
@@ -42,7 +41,7 @@ class MoveitPlanExecuteState(EventState):
 		Constructor
 		'''
 		super(MoveitPlanExecuteState, self).__init__(outcomes=['received','done', 'collision'],
-											input_keys=['obj_position'],
+											input_keys=['excute_position'],
 											output_keys=['result_compute'])
 		# group_name = ""
 		self._group_name = group_name
@@ -80,21 +79,43 @@ class MoveitPlanExecuteState(EventState):
 		# print(self._result)
 		# print("==================================================================")
 		# print(np.size(userdata.hand_eye_points))
+
+
+		new_pose = self._move_group.get_current_pose()
 		
 		pose_goal = geometry_msgs.msg.Pose()
-		pose_goal.position.x = userdata.obj_position["x"][self._execute_times]
-		pose_goal.position.y = userdata.obj_position["y"][self._execute_times]
-		# pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.16265
-		pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.17265
+
+		if np.size(userdata.excute_position["x"]) == 0:
+			pose_goal.position.x = self._first_pose.pose.position.x
+			pose_goal.position.y = self._first_pose.pose.position.y
+			pose_goal.position.z = self._first_pose.pose.position.z
+		# 	pose_goal.orientation.x = userdata.obj_position["qx"][self._execute_times]
+		# 	pose_goal.orientation.y = userdata.obj_position["qy"][self._execute_times]
+		# 	pose_goal.orientation.z = userdata.obj_position["qz"][self._execute_times]
+		# 	pose_goal.orientation.w = userdata.obj_position["qw"][self._execute_times]
+		# pose_goal.orientation.x = new_pose.pose.orientation.x
+		# pose_goal.orientation.y = new_pose.pose.orientation.y
+		# pose_goal.orientation.z = new_pose.pose.orientation.z
+		# pose_goal.orientation.w = new_pose.pose.orientation.w
+		else:
+			pose_goal.position.x = userdata.excute_position["x"][self._execute_times]
+			pose_goal.position.y = userdata.excute_position["y"][self._execute_times]
+			pose_goal.position.z = userdata.excute_position["z"][self._execute_times]
+		# pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.22665
 		# pose_goal.position.x = self._first_pose.pose.position.x
 		# pose_goal.position.y = self._first_pose.pose.position.y
 		# pose_goal.position.z = self._first_pose.pose.position.z
 
 
-		pose_goal.orientation.x = userdata.obj_position["qx"][self._execute_times]
-		pose_goal.orientation.y = userdata.obj_position["qy"][self._execute_times]
-		pose_goal.orientation.z = userdata.obj_position["qz"][self._execute_times]
-		pose_goal.orientation.w = userdata.obj_position["qw"][self._execute_times]
+		pose_goal.orientation.x = userdata.excute_position["qx"][self._execute_times]
+		pose_goal.orientation.y = userdata.excute_position["qy"][self._execute_times]
+		pose_goal.orientation.z = userdata.excute_position["qz"][self._execute_times]
+		pose_goal.orientation.w = userdata.excute_position["qw"][self._execute_times]
+
+
+
+
+
 		print(pose_goal)
 		input()
 		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
@@ -120,7 +141,9 @@ class MoveitPlanExecuteState(EventState):
 		# current_pose = self._move_group.get_current_pose()
 		# cprint("current pose",current_pose)
 
+		# if userdata.excute_position["x"][0] == 0.00:
 
+		# 	return 'received'
 
 		if self._result == MoveItErrorCodes.SUCCESS:
 			self._execute_times += 1
@@ -133,8 +156,8 @@ class MoveitPlanExecuteState(EventState):
 		# 	return 'failed'
 
 	def on_enter(self, userdata):
-		if self._execute_times <= 0:
-			self.points_num  = self.points_num + np.size(userdata.obj_position["x"])
+		# if self._execute_times <= 0:
+		# 	self.points_num  = self.points_num + np.size(userdata.excute_position["x"])
 		pass
 
 	def on_stop(self):

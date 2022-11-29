@@ -6,6 +6,11 @@
     <arg name="camera_info_topic" default="/camera/color/camera_info" />
     <arg name="base_link" default="/base_link" />
     <arg name="tip_link" default="/tool0_controller" />
+    <arg name="eye_in_hand_mode" default="false" />
+    <arg name="customize" default="false" />
+    <arg name="filename" default="" />
+
+    
 
 
     <!--<include file="$(find realsense2_camera)/launch/rs_hand_eye.launch">
@@ -30,6 +35,9 @@
     </include>
 
     <node pkg="charuco_detector" type="hand_eye_trans.py" name="charuco_detector" output="screen">
+        <param name="eye_in_hand_mode" value="$(arg eye_in_hand_mode)" />
+        <param name="customize" value="$(arg customize)" />
+        <param name="filename" value="$(arg filename)" />
         <param name="base_link" value="$(arg base_link)" />
         <param name="tip_link" value="$(arg tip_link)" />
     </node>

@@ -86,6 +86,7 @@ include_directories(
 
 add_library(charuco_detector
     src/charuco_detector.cpp
+    #include/ini/ini.h
 )
 
 
@@ -106,7 +107,6 @@ target_link_libraries(
     charuco_detector
     ${catkin_LIBRARIES}
     ${OpenCV_LIBS}
-    inih
 )
 
 

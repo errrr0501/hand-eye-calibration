@@ -9,6 +9,7 @@
 
 from flexbe_core import Behavior, Autonomy, OperatableStateMachine, ConcurrencyContainer, PriorityContainer, Logger
 from hand_eye_flexbe_states.get_ar_marker import GetArMarkerState
+from hand_eye_flexbe_states.initial_pose import InitialPoseState
 from hand_eye_flexbe_states.moveit_plan_excute import MoveitPlanExecuteState
 from hand_eye_flexbe_states.obj_trans_to_arm import ObjTransToArmState
 # Additional imports can be added inside the following tags
@@ -50,7 +51,7 @@ class verify_calibraionSM(Behavior):
 
 
 	def create(self):
-		# x:602 y:314, x:130 y:365
+		# x:48 y:501, x:58 y:229
 		_state_machine = OperatableStateMachine(outcomes=['finished', 'failed'])
 
 		# Additional creation code can be added inside the following tags
@@ -60,26 +61,32 @@ class verify_calibraionSM(Behavior):
 
 
 		with _state_machine:
-			# x:193 y:98
+			# x:250 y:76
 			OperatableStateMachine.add('get_obj_position',
-										GetArMarkerState(),
+										GetArMarkerState(eye_in_hand_mode=self.eye_in_hand_mode),
 										transitions={'done': 'obj_to_arm_base', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
 										remapping={'camera_h_charuco': 'camera_h_charuco'})
 
-			# x:272 y:192
+			# x:551 y:180
+			OperatableStateMachine.add('excute_moveit_plan',
+										MoveitPlanExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
+										transitions={'received': 'excute_moveit_plan', 'done': 'back_home', 'collision': 'failed'},
+										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'collision': Autonomy.Off},
+										remapping={'excute_position': 'excute_position', 'result_compute': 'result_compute'})
+
+			# x:564 y:83
 			OperatableStateMachine.add('obj_to_arm_base',
 										ObjTransToArmState(eye_in_hand_mode=self.eye_in_hand_mode, base_link=self.base_link, tip_link=self.tip_link),
 										transitions={'done': 'excute_moveit_plan', 'failed': 'failed'},
 										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off},
-										remapping={'camera_h_charuco': 'camera_h_charuco', 'obj_position': 'obj_position'})
+										remapping={'camera_h_charuco': 'camera_h_charuco', 'excute_position': 'excute_position'})
 
-			# x:323 y:408
-			OperatableStateMachine.add('excute_moveit_plan',
-										MoveitPlanExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
-										transitions={'received': 'excute_moveit_plan', 'done': 'finished', 'collision': 'failed'},
-										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'collision': Autonomy.Off},
-										remapping={'obj_position': 'obj_position', 'result_compute': 'result_compute'})
+			# x:294 y:315
+			OperatableStateMachine.add('back_home',
+										InitialPoseState(group_name=self.group_name, reference_frame=self.reference_frame),
+										transitions={'done': 'finished', 'collision': 'failed'},
+										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off})
 
 
 		return _state_machine
