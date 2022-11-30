@@ -40,7 +40,7 @@ class MoveitPlanExecuteState(EventState):
 		'''
 		Constructor
 		'''
-		super(MoveitPlanExecuteState, self).__init__(outcomes=['received','done', 'collision'],
+		super(MoveitPlanExecuteState, self).__init__(outcomes=['done', 'collision'],
 											input_keys=['excute_position'],
 											output_keys=['result_compute'])
 		# group_name = ""
@@ -74,12 +74,6 @@ class MoveitPlanExecuteState(EventState):
 		'''
 		Execute this state
 		'''
-		# print("")
-		# print("==================================================================")
-		# print(self._result)
-		# print("==================================================================")
-		# print(np.size(userdata.hand_eye_points))
-
 
 		new_pose = self._move_group.get_current_pose()
 		
@@ -89,22 +83,11 @@ class MoveitPlanExecuteState(EventState):
 			pose_goal.position.x = self._first_pose.pose.position.x
 			pose_goal.position.y = self._first_pose.pose.position.y
 			pose_goal.position.z = self._first_pose.pose.position.z
-		# 	pose_goal.orientation.x = userdata.obj_position["qx"][self._execute_times]
-		# 	pose_goal.orientation.y = userdata.obj_position["qy"][self._execute_times]
-		# 	pose_goal.orientation.z = userdata.obj_position["qz"][self._execute_times]
-		# 	pose_goal.orientation.w = userdata.obj_position["qw"][self._execute_times]
-		# pose_goal.orientation.x = new_pose.pose.orientation.x
-		# pose_goal.orientation.y = new_pose.pose.orientation.y
-		# pose_goal.orientation.z = new_pose.pose.orientation.z
-		# pose_goal.orientation.w = new_pose.pose.orientation.w
+
 		else:
 			pose_goal.position.x = userdata.excute_position["x"][self._execute_times]
 			pose_goal.position.y = userdata.excute_position["y"][self._execute_times]
 			pose_goal.position.z = userdata.excute_position["z"][self._execute_times]
-		# pose_goal.position.z = userdata.obj_position["z"][self._execute_times]+0.22665
-		# pose_goal.position.x = self._first_pose.pose.position.x
-		# pose_goal.position.y = self._first_pose.pose.position.y
-		# pose_goal.position.z = self._first_pose.pose.position.z
 
 
 		pose_goal.orientation.x = userdata.excute_position["qx"][self._execute_times]
@@ -120,44 +103,23 @@ class MoveitPlanExecuteState(EventState):
 		input()
 		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
 
-		# input()
-		# excute planing path
 		self._result = self._move_group.go(wait=True)
 		self._move_group.stop()
 		self._move_group.clear_pose_targets()
 
 		userdata.result_compute = self._execute_times >= self.points_num
 
-		# if userdata.result_compute:
-		# 	return 'done'
 
-		# print("==================================================================")
-		# print(userdata.result_compute)
-		# print("==================================================================")
-		# print(self._execute_times)
-		# print(self.points_num)
-
-
-		# current_pose = self._move_group.get_current_pose()
-		# cprint("current pose",current_pose)
-
-		# if userdata.excute_position["x"][0] == 0.00:
-
-		# 	return 'received'
 
 		if self._result == MoveItErrorCodes.SUCCESS:
 			self._execute_times += 1
-			# print(self.execute_num)
 			return 'done'
 			
 		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
 			return 'collision'
-		# else:
-		# 	return 'failed'
+
 
 	def on_enter(self, userdata):
-		# if self._execute_times <= 0:
-		# 	self.points_num  = self.points_num + np.size(userdata.excute_position["x"])
 		pass
 
 	def on_stop(self):
@@ -167,5 +129,4 @@ class MoveitPlanExecuteState(EventState):
 		pass
 
 	def on_resume(self, userdata):
-		# self.on_enter(userdata)
 		pass

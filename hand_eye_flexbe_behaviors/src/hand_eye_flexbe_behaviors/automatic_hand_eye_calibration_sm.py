@@ -44,10 +44,7 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 		self.add_parameter('move_distance', 0.10)
 		self.add_parameter('reference_frame', 'base_link')
 		self.add_parameter('group_name', 'manipulator')
-		self.add_parameter('axis', '-yxz')
-		self.add_parameter('cam_x', 1)
-		self.add_parameter('cam_y', 1)
-		self.add_parameter('cam_z', 1)
+		self.add_parameter('axis', 'x-y-z')
 		self.add_parameter('points_num', 24)
 
 		# references to used behaviors
@@ -102,17 +99,24 @@ class AutomaticHandEyeCalibrationSM(Behavior):
 
 			# x:83 y:243
 			OperatableStateMachine.add('Generate_Points',
-										GenerateHandEyePointState(eye_in_hand_mode=self.eye_in_hand_mode, base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num, cam_x=self.cam_x, cam_y=self.cam_y, cam_z=self.cam_z, axis=self.axis),
-										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed', 'correct_rotation': 'Moveit_Execute_Points'},
-										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off, 'correct_rotation': Autonomy.Off},
-										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points', 'excute_position': 'excute_position'})
+										GenerateHandEyePointState(eye_in_hand_mode=self.eye_in_hand_mode, base_link=self.base_link, tip_link=self.tip_link, move_distance=self.move_distance, group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num, axis=self.axis),
+										transitions={'done': 'Moveit_Execute_Points', 'failed': 'failed', 'correct_pose': 'Moveit_Execute_Points', 'recheck': 'recheck_Charuco'},
+										autonomy={'done': Autonomy.Off, 'failed': Autonomy.Off, 'correct_pose': Autonomy.Off, 'recheck': Autonomy.Off},
+										remapping={'camera_h_charuco': 'camera_h_charuco', 'hand_eye_points': 'hand_eye_points', 'motion_state': 'motion_state', 'result_compute': 'result_compute'})
 
 			# x:468 y:112
 			OperatableStateMachine.add('Moveit_Execute_Points',
 										MoveitHandEyeExecuteState(group_name=self.group_name, reference_frame=self.reference_frame, points_num=self.points_num),
 										transitions={'received': 'Find_Charuco', 'done': 'Find_Charuco', 'finish_correction': 'Generate_Points', 'collision': 'failed'},
 										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'finish_correction': Autonomy.Off, 'collision': Autonomy.Off},
-										remapping={'hand_eye_points': 'hand_eye_points', 'result_compute': 'result_compute'})
+										remapping={'hand_eye_points': 'hand_eye_points', 'motion_state': 'motion_state', 'result_compute': 'result_compute'})
+
+			# x:29 y:458
+			OperatableStateMachine.add('recheck_Charuco',
+										FindCharucoState(base_link=self.base_link, tip_link=self.tip_link, eye_in_hand_mode=self.eye_in_hand_mode),
+										transitions={'done': 'recheck_Charuco', 'go_compute': 'Generate_Points'},
+										autonomy={'done': Autonomy.Off, 'go_compute': Autonomy.Off},
+										remapping={'result_compute': 'result_compute', 'base_h_tool': 'base_h_tool', 'camera_h_charuco': 'camera_h_charuco'})
 
 			# x:356 y:325
 			OperatableStateMachine.add('Back_to_Initial_Pose',

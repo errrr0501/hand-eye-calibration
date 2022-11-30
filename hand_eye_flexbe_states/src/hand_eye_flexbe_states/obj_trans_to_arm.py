@@ -168,36 +168,9 @@ class ObjTransToArmState(EventState):
 			rospy.logerr("Service call failed: %s" % e)
 			return 'failed'
 
-		# print(res)
-		# print(res.pos[0])
-		# print(res)
-
 		self.excute_pos = res.pos
 		
 		self.quaternion = [res.quat[0], res.quat[1], res.quat[2], res.quat[3]]
-
-
-
-		# temp_pose = self.tf_listener.fromTranslationRotation((res.pos[0], res.pos[1], res.pos[2])
-		# 													,(res.quat[0],
-		# 													  res.quat[1],
-		# 													  res.quat[2],
-		# 													  res.quat[3]))
-		# print(temp_pose)
-		# if self.eye_in_hand_mode:
-		# 	Final_Pos = temp_pose * Rx
-			
-		# else:
-		# 	Final_Pos = temp_pose * Ry
-		# if self.eye_in_hand_mode:
-		# 	Final_Pos = Rx*temp_pose 
-		# 	# 
-		# else:
-		# 	Final_Pos = Ry*temp_pose
-									
-
-		# self.excute_pos = np.array(Final_Pos[0:3, 3]).reshape(-1)
-		# self.quaternion = tf.transformations.quaternion_from_matrix(Final_Pos)
 
 
 		origindegree = list(euler_from_quaternion(self.quaternion))

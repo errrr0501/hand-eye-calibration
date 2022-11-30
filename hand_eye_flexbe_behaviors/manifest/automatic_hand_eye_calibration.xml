@@ -40,22 +40,7 @@
 
 		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
 
-		<param type="text" name="axis" default="-yxz" label="axis" hint="Sets the axis" />
-
-		<param type="numeric" name="cam_x" default="1" label="cam_x" hint="Sets the cam_x">
-			<min value="-1" />
-			<max value="1" />
-		</param>
-
-		<param type="numeric" name="cam_y" default="1" label="cam_y" hint="Sets the cam_y">
-			<min value="-1" />
-			<max value="1" />
-		</param>
-
-		<param type="numeric" name="cam_z" default="1" label="cam_z" hint="Sets the cam_z">
-			<min value="-1" />
-			<max value="1" />
-		</param>
+		<param type="text" name="axis" default="x-y-z" label="axis" hint="Sets the axis" />
 
 		<param type="numeric" name="points_num" default="24" label="points_num" hint="Sets the points_num">
 			<min value="0" />

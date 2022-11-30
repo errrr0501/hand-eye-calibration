@@ -67,9 +67,6 @@ class HandEyeTrans:
 		K21 = float(config.get("Intrinsic", "2_1"))
 		K22 = float(config.get("Intrinsic", "2_2"))
 
-		# color_width = rospy.get_param('~color_width')
-		# color_high = rospy.get_param('~color_high')
-		# internal_name = 'Internal_' + str(color_width) + '_' + str(color_high)
 		if self.customize:
 			config.read(self.hand_eye_cali_pwd + self.filename)
 		else:
@@ -89,6 +86,7 @@ class HandEyeTrans:
 
 
 		tool_eye_trans = self.tf_listener.fromTranslationRotation((x,y,z),(qx,qy,qz,qw))
+		# print("tool_eye_trans",tool_eye_trans)
 
 
 		Intrinsic = np.mat([[K00, K01, K02],
@@ -98,8 +96,7 @@ class HandEyeTrans:
 
 	def __get_robot_trans(self):
 		try:
-			# (base_trans_tool, base_rot_tool) = self.tf_listener.lookupTransform(self.base_link, self.tip_link, rospy.Time(0))
-			(base_trans_tool, base_rot_tool) = self.tf_listener.lookupTransform(self.tip_link, self.base_link, rospy.Time(0))
+			(base_trans_tool, base_rot_tool) = self.tf_listener.lookupTransform(self.base_link, self.tip_link, rospy.Time(0))
 		except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
 			rospy.logwarn('lookupTransform for robot failed!, ' + self.base_link + ', ' + self.tip_link)
 
@@ -121,46 +118,17 @@ class HandEyeTrans:
 		return
 
 	def __rotation2quat(self, rotation):
-		# _rpy = []
-		# print(rotation)
-		# print(rotation[0,1])
-		###################################################################
-		# theta1 = np.arctan(rotation[1, 0] / rotation[0, 0])
-		# theta2 = np.arctan(-rotation[2, 0] * np.cos(theta1) / rotation[0, 0])
-		# theta3 = np.arctan(rotation[2, 1] / rotation[2, 2])
-		# theta1 = theta1 * 180 / np.pi
-		# theta2 = theta2 * 180 / np.pi
-		# theta3 = theta3 * 180 / np.pi
-		# _rpy.append(theta1)
-		# _rpy.append(theta2)
-		# _rpy.append(theta3)
-		##################################################################
-		# _pitch = degrees(asin(rotation[1, 2]))
-		# _roll = degrees(atan2(rotation[0, 2], -rotation[2, 2]))
-		# _yaw = degrees(atan2(-rotation[1, 0], -rotation[1, 1]))
-		# _rpy.append(_roll)
-		# _rpy.append(_pitch)
-		# _rpy.append(_yaw)
-		##################################################################
-		# quat_result = R.from_matrix([[rotation[0,0], rotation[0,1], rotation[0,2]],
-		#            							[rotation[1,0], rotation[1,1], rotation[1,2]],
-		#            							[rotation[2,0], rotation[2,1], rotation[2,2]]]).as_quat()
-		# quat_result = np.array(quat_result).reshape(-1)
-		###############################################################################
-		# qw = np.math.sqrt(float(1)+rotation[0,0]+rotation[1,1]+rotation[2,2])*0.5
-		# qx = (rotation[2,1]-rotation[1,2])/(4*qw)
-		# qy = (rotation[0,2]-rotation[2,0])/(4*qw)
-		# qz = (rotation[1,0]-rotation[0,1])/(4*qw)
-		# quat_result = [qx,qy,qz,qw]
+
 		#################################################################################################
 		quat_result = tf.transformations.quaternion_from_matrix(rotation)
 		####################################################################################################
 
-		print("---------------------------------")
-		print(quat_result)
+		# print("---------------------------------")
+		# print(quat_result)
 		return quat_result
 		
 	def __eye2base_transform(self, req):
+		##################not finish yet############################
 		self.__get_robot_trans()
 		assert len(req.ini_pose) == 3
 		eye_obj_trans = np.mat(np.append(np.array(req.ini_pose), 1)).reshape(4, 1)
@@ -193,6 +161,7 @@ class HandEyeTrans:
 		
 
 	def __pix2base_transform(self, req):
+		##################not finish yet############################
 		self.__get_robot_trans()
 		assert len(req.ini_pose) == 3
 		eye_obj_trans = np.mat(np.append(np.array(req.ini_pose), 1)).reshape(4, 1)

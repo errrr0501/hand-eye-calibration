@@ -78,8 +78,7 @@ class InitialPoseState(EventState):
 			
 		elif self._result == MoveItErrorCodes.MOTION_PLAN_INVALIDATED_BY_ENVIRONMENT_CHANGE:
 			return 'collision'
-		# else:
-		# 	return 'failed'
+
 
 	def on_enter(self, userdata):
 		pass
