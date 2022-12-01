@@ -61,7 +61,7 @@ class MoveitPlanExecuteState(EventState):
 
 	def on_start(self):
 		# back to first pose
-		# input()
+		# raw_input()
 		# self._result = self._move_group.go(self._first_joints, wait=True)
 		# self._move_group.stop()
 		# self._move_group.clear_pose_targets()
@@ -100,7 +100,7 @@ class MoveitPlanExecuteState(EventState):
 
 
 		print(pose_goal)
-		input()
+		raw_input()
 		self._move_group.set_pose_target(pose_goal, self._end_effector_link)
 
 		self._result = self._move_group.go(wait=True)

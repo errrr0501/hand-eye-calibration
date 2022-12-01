@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
-import configparser,os
+import ConfigParser,os
 import rospkg
 import numpy as np
 import tf
@@ -50,7 +50,7 @@ class ComputeCalibState(EventState):
 		print('qz = ' + str(res.effector_camera.rotation.z))
 		print('qw = ' + str(res.effector_camera.rotation.w))
 
-		config = configparser.ConfigParser()
+		config = ConfigParser.ConfigParser()
 		config.optionxform = str #reference: http://docs.python.org/library/configparser.html
 		config.read(self.save_pwd + self.calibration_file_name)
 		# config.read(curr_path + '/config/hand_eye_calibration/'+ self.calibration_file_name)

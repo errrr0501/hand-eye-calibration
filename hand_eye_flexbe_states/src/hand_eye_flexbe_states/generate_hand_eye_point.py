@@ -108,7 +108,7 @@ class GenerateHandEyePointState(EventState):
 		base_move_pos[2] = (self.wpose.position.z - base_move_pos[2])
 
 		print("delta_pos",base_move_pos)
-		input()
+		raw_input()
 		
 		return base_move_pos
 
@@ -117,7 +117,7 @@ class GenerateHandEyePointState(EventState):
 	def generate_points(self, roll_detla, pitch_delta, yaw_delta, x_distance, y_distance, z_distance):
 
 		print(x_distance)
-		# input()
+		# raw_input()
 
 		try:
 			(tool_trans_base, tool_rot_base) = self.tf_listener.lookupTransform(self.tip_link, self.base_link, rospy.Time(0))
@@ -186,8 +186,8 @@ class GenerateHandEyePointState(EventState):
 				self.rotation_correct = True
 				return 'correct_pose'
 
-			self.waypoints.clear()
-			self.plan_path.clear()
+			self.waypoints = []
+			self.plan_path = []
 			##############need to decide endeffector axis#################################
 			if self.eye_in_hand_mode:
 				#####move axis from camera
@@ -228,8 +228,8 @@ class GenerateHandEyePointState(EventState):
 				self.centralized = True
 				return 'correct_pose'
 		
-			self.waypoints.clear()
-			self.plan_path.clear()	
+			self.waypoints = []
+			self.plan_path = []
 			quaternion =  quaternion_from_euler(np.radians(self.roll+15*self.degree_direction),
 												np.radians(self.pitch), 
 												np.radians(self.yaw))  	
@@ -248,7 +248,7 @@ class GenerateHandEyePointState(EventState):
                																0.01,        # eef_step
                																0.0)         # jump_threshold
 				self.plan_path.append(plan)
-				self.waypoints.clear()
+				self.waypoints = []
 				self.loop_num += 1
 			quaternion =  quaternion_from_euler(np.radians(self.roll),
 												np.radians(self.pitch+15*self.degree_direction), 
@@ -268,7 +268,7 @@ class GenerateHandEyePointState(EventState):
                																0.01,        # eef_step
                																0.0)         # jump_threshold
 				self.plan_path.append(plan)
-				self.waypoints.clear()
+				self.waypoints = []
 				self.loop_num += 1
 			quaternion =  quaternion_from_euler(np.radians(self.roll-15*self.degree_direction),
 												np.radians(self.pitch), 
@@ -287,7 +287,7 @@ class GenerateHandEyePointState(EventState):
                																0.01,        # eef_step
                																0.0)         # jump_threshold
 				self.plan_path.append(plan)
-				self.waypoints.clear()
+				self.waypoints = []
 				self.loop_num += 1
 			quaternion =  quaternion_from_euler(np.radians(self.roll),
 												np.radians(self.pitch-15*self.degree_direction), 
@@ -306,7 +306,7 @@ class GenerateHandEyePointState(EventState):
                																0.01,        # eef_step
                																0.0)         # jump_threshold
 				self.plan_path.append(plan)
-				self.waypoints.clear()
+				self.waypoints = []
 				self.loop_num += 1
 			
 			# self.plan_path.append(self.plan_path[0])

@@ -25,9 +25,9 @@
 			<max value="20" />
 		</param>
 
-		<param type="text" name="base_link" default="/base_link" label="base_link" hint="Sets the base_link" />
+		<param type="text" name="base_link" default="manipulator/base_link" label="base_link" hint="Sets the base_link" />
 
-		<param type="text" name="tip_link" default="/tool0_controller" label="tip_link" hint="Sets the tip_link" />
+		<param type="text" name="tip_link" default="manipulator/tool0" label="tip_link" hint="Sets the tip_link" />
 
 		<param type="text" name="calibration_file_name" default="hand_eye_calibration.ini" label="calibration_file_name" hint="Sets the calibration_file_name" />
 
@@ -36,7 +36,7 @@
 			<max value="0.30" />
 		</param>
 
-		<param type="text" name="reference_frame" default="base_link" label="reference_frame" hint="Sets the reference_frame" />
+		<param type="text" name="reference_frame" default="manipulator/base_link" label="reference_frame" hint="Sets the reference_frame" />
 
 		<param type="text" name="group_name" default="manipulator" label="group_name" hint="Sets the group_name" />
 

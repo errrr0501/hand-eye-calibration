@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import numpy as np
 import rospy
 import rospkg
 import tf
-import configparser
+import ConfigParser
 from math import asin, atan2, degrees, pi
 from charuco_detector.srv import eye2base, eye2baseResponse
 from visp_hand2eye_calibration.msg import TransformArray
@@ -52,7 +52,7 @@ class HandEyeTrans:
 
 
 	def __get_camera_param(self):
-		config = configparser.ConfigParser()
+		config = ConfigParser.ConfigParser()
 		config.optionxform = str
 
 		config.read(self.save_camera_cali_pwd + 'camera_calibration.ini')

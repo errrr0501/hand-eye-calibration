@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import rospy,os
 import copy
-import configparser
 import numpy as np
 import math as m
 from visp_hand2eye_calibration.msg import TransformArray

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import rospy
 import numpy as np
@@ -76,7 +76,7 @@ class MoveitHandEyeExecuteState(EventState):
 		print(np.size(userdata.hand_eye_points))
 		print(self._execute_times)
 		self.plan = userdata.hand_eye_points[self._execute_times]
-		# input()
+		raw_input()
 		# excute planing path
 		self._result = self._move_group.execute(self.plan, wait=True)
 

@@ -61,13 +61,19 @@ class InitialPoseState(EventState):
 		Execute this state
 		'''
 		joint_goal= self._move_group.get_current_joint_values()
-		joint_goal[0] =  pi * 0.5
-		joint_goal[1] = -pi * 0.5
-		joint_goal[2] =  pi * 0.5
-		joint_goal[3] = -pi * 0.5
+		# joint_goal[0] =  pi * 0.5
+		# joint_goal[1] = -pi * 0.5
+		# joint_goal[2] =  pi * 0.5
+		# joint_goal[3] = -pi * 0.5
+		# joint_goal[4] = -pi * 0.5
+		# joint_goal[5] = -pi * 0.5   
+		joint_goal[0] = 0
+		joint_goal[1] = 0
+		joint_goal[2] = 0
+		joint_goal[3] = 0
 		joint_goal[4] = -pi * 0.5
-		joint_goal[5] = -pi * 0.5   
-		input() 
+		joint_goal[5] = 0   
+		raw_input() 
 		self._result = self._move_group.go(joint_goal, wait=True)
 		self._move_group.stop()
 		self._move_group.clear_pose_targets()
