@@ -75,6 +75,7 @@ class GenerateHandEyePointState(EventState):
 		self.roll = 0
 		self.pitch = 0
 		self.yaw = 0
+		self.correct_degree = []
 		self.cen_delta_x = 0.000
 		self.cen_delta_y = 0.000
 		self.cen_delta_z = 0.000
@@ -217,6 +218,10 @@ class GenerateHandEyePointState(EventState):
 				self.wpose.position.x += cen_pose[0]
 				self.wpose.position.y += cen_pose[1]
 				self.wpose.position.z += cen_pose[2]
+				correct_degree = euler_from_quaternion([self.wpose.orientation.x, self.wpose.orientation.y, self.wpose.orientation.z, self.wpose.orientation.w])
+				self.correct_degree.append(correct_degree[0]/3.14*180.0)
+				self.correct_degree.append(correct_degree[1]/3.14*180.0)
+				self.correct_degree.append(correct_degree[2]/3.14*180.0)
 				# print("self.wpose",self.wpose.position.x, self.wpose.position.y, self.wpose.position.z)
 				self.waypoints.append(copy.deepcopy(self.wpose))
 				(plan, fraction) = self._move_group.compute_cartesian_path(self.waypoints,   # waypoints to follow
@@ -230,9 +235,11 @@ class GenerateHandEyePointState(EventState):
 		
 			self.waypoints.clear()
 			self.plan_path.clear()	
-			quaternion =  quaternion_from_euler(np.radians(self.roll+15*self.degree_direction),
-												np.radians(self.pitch), 
-												np.radians(self.yaw))  	
+
+			
+			quaternion =  quaternion_from_euler(np.radians(self.correct_degree[0]+15*self.degree_direction),
+												np.radians(self.correct_degree[1]), 
+												np.radians(self.correct_degree[2]))  
 			##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 			for self.loop_num in range(self.loop_size):
 				self.wpose = self._move_group.get_current_pose().pose
@@ -250,9 +257,9 @@ class GenerateHandEyePointState(EventState):
 				self.plan_path.append(plan)
 				self.waypoints.clear()
 				self.loop_num += 1
-			quaternion =  quaternion_from_euler(np.radians(self.roll),
-												np.radians(self.pitch+15*self.degree_direction), 
-												np.radians(self.yaw))  	
+			quaternion =  quaternion_from_euler(np.radians(self.correct_degree[0]),
+												np.radians(self.correct_degree[1]+15*self.degree_direction), 
+												np.radians(self.correct_degree[2]))  	
 			##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 			
 			for self.loop_num in range(self.loop_size,self.loop_size*2):
@@ -270,9 +277,9 @@ class GenerateHandEyePointState(EventState):
 				self.plan_path.append(plan)
 				self.waypoints.clear()
 				self.loop_num += 1
-			quaternion =  quaternion_from_euler(np.radians(self.roll-15*self.degree_direction),
-												np.radians(self.pitch), 
-												np.radians(self.yaw))  		
+			quaternion =  quaternion_from_euler(np.radians(self.correct_degree[0]-15*self.degree_direction),
+												np.radians(self.correct_degree[1]), 
+												np.radians(self.correct_degree[2]))  		
 			##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 			for self.loop_num in range(self.loop_size*2,self.loop_size*3):
 				self.wpose = self._move_group.get_current_pose().pose
@@ -289,9 +296,9 @@ class GenerateHandEyePointState(EventState):
 				self.plan_path.append(plan)
 				self.waypoints.clear()
 				self.loop_num += 1
-			quaternion =  quaternion_from_euler(np.radians(self.roll),
-												np.radians(self.pitch-15*self.degree_direction), 
-												np.radians(self.yaw)) 
+			quaternion =  quaternion_from_euler(np.radians(self.correct_degree[0]),
+												np.radians(self.correct_degree[1]-15*self.degree_direction), 
+												np.radians(self.correct_degree[2])) 
 			##############################################roll_angle, ##########################pitch_angle, ######################yaw_angle  
 			for self.loop_num in range(self.loop_size*3,self.points_num):
 				self.wpose = self._move_group.get_current_pose().pose

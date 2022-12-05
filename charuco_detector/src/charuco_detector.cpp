@@ -125,7 +125,7 @@ namespace charuco_detector {
 		// ROS_WARN("============================");
 		// std::cout << *pwd <<std::endl;
 
-		inih::INIReader Camera_KD{"/home/iclab_luis/work/ur5_hand_eye/src/hand-eye-calibration/charuco_detector/config/camera_calibration/camera_calibration.ini"};
+		inih::INIReader Camera_KD{"/home/iclab_luis/work/hand_eye_calibration/src/hand-eye-calibration/charuco_detector/config/camera_calibration/camera_calibration.ini"};
 		// inih::INIReader Camera_KD{"../../config/camera_calibration/camera_calibration.ini"};
 		// INIReader Camera_KD;
 		// Camera_KD.read("camera_calibration.ini");
