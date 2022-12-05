@@ -7,7 +7,7 @@ import cv2
 from cv2 import aruco
 import pickle
 import glob,os
-import configparser
+import ConfigParser
 from sensor_msgs.msg import CameraInfo
 
 class CharucoCameraCalibrationState(EventState):
@@ -136,7 +136,7 @@ class CharucoCameraCalibrationState(EventState):
 		print(cameraMatrix)
 		print(distCoeffs)
 		print("-----------------------------------------------------")
-		config = configparser.ConfigParser()
+		config = ConfigParser.ConfigParser()
 		config.optionxform = str 
 		#reference: http://docs.python.org/library/configparser.html
 		# rospack = rospkg.RosPack()

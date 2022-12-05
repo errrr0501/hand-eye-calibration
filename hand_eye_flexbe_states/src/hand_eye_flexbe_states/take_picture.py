@@ -84,11 +84,12 @@ class TakePictureState(EventState):
             cv2.imshow('preview', images)
             #cv2.imshow('Real', images)
             key = cv2.waitKey(1)
-            if key  == 13 : #enter
+            if key  == 13 or key & 0xFF ==ord('s'): #enter
                 print("----------------------------------------------")
                 # cv2.imwrite("./../../../config/pic/camera-pic-of-charucoboard-"+str(self.excu_num)+".jpg",images)
                 cv2.imwrite(self.save_pwd+"camera-pic-of-charucoboard-"+str(self.excu_num)+".jpg",images)
                 self.excu_num += 1
+                print(self.excu_num)
             #cv2.imshow('frame', frame)
             elif key & 0xFF == ord('q')or key == 27: # q or esc
                 print("==========================================")

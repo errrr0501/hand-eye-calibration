@@ -34,10 +34,10 @@ class verify_calibraionSM(Behavior):
 
 		# parameters of this behavior
 		self.add_parameter('eye_in_hand_mode', False)
-		self.add_parameter('base_link', '/base_link')
-		self.add_parameter('tip_link', '/tool0_controller')
+		self.add_parameter('base_link', 'manipulator/base_link')
+		self.add_parameter('tip_link', 'manipulator/tool0')
 		self.add_parameter('group_name', 'manipulator')
-		self.add_parameter('reference_frame', 'base_link')
+		self.add_parameter('reference_frame', 'manipulator/base_link')
 
 		# references to used behaviors
 
@@ -71,8 +71,8 @@ class verify_calibraionSM(Behavior):
 			# x:551 y:180
 			OperatableStateMachine.add('excute_moveit_plan',
 										MoveitPlanExecuteState(group_name=self.group_name, reference_frame=self.reference_frame),
-										transitions={'received': 'excute_moveit_plan', 'done': 'back_home', 'collision': 'failed'},
-										autonomy={'received': Autonomy.Off, 'done': Autonomy.Off, 'collision': Autonomy.Off},
+										transitions={'done': 'back_home', 'collision': 'failed'},
+										autonomy={'done': Autonomy.Off, 'collision': Autonomy.Off},
 										remapping={'excute_position': 'excute_position', 'result_compute': 'result_compute'})
 
 			# x:564 y:83
