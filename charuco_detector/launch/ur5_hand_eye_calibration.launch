@@ -6,7 +6,7 @@
     <arg name="camera_info_topic" default="/camera/color/camera_info" />
     <arg name="base_link" default="/base_link" />
     <arg name="tip_link" default="/tool0_controller" />
-    <arg name="eye_in_hand_mode" default="False" />
+    <arg name="eye_in_hand_mode" default="True" />
     <arg name="customize" default="false" />
     <arg name="filename" default="" />
 

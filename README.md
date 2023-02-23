@@ -76,12 +76,31 @@ If you want to change robot, copy and edit this launch file.
 
 
 #### Quick start
-
-we use whole method with FlexBE and ROS, open FlexBE first:
+Note:Here we use Realsense D435i+UR5, 
+we use whole method with FlexBE and ROS, open camera with ROS first:
 
 ```bash
-roslaunch flexbe_app flexbe_full.launch
+cd ~/<your ros_realsense workspace>
+source devel/setup.bash
+roslaunch realsense2_camera rs_camera.launch color_width:=1920 color_height:=1080 color_fps:=30 
 ```
+WARN:Here use 1080p as camera resolution, because we use 1080p as camera calibration resolution,
+if you want to change resolution, need to do camera calibration again with the resolution you change.
+
+Then launch hand_eye_calibration.lunch, will pop up rviz and FlexBE windows, rviz can check camera view,
+FlexBE is for user to change parameter.
+
+```bash
+roslaunch charuco_detector ur5_hand_eye_calibration.launch
+```
+Note: In launch file we can chage parameter `robot_ip` for real robot's ip,
+parameter `image_topic` is for recieve camera view with ROS, default is `/camera/color/image_raw`
+parameter `camera_info_topic` is for recieve camera info on ROS, default is `/camera/color/camera_info`
+parameter `base_link` choose the base coordinate for hand-eye-transform.
+parameter `tip_link` choose the end-effector coordinate for hand-eye-transform.
+parameter `eye_in_hand_mode` is for hand-eye-transform program know which mode we use.
+parameter `customize` is to decide whether want to load result with customize name.
+parameter `filename` is the custo,ized result file name.
 
 Then, press `Load Behavior` on the top, and select `Automatic Hand Eye Calibration` in left window.
 
