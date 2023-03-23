@@ -57,7 +57,7 @@ Then, press `Load Behavior` on the top, and select `camera_calibration` in left 
 
 After this, you can press `Runtime Control` on the top, execution window will show:
 
-<center><img src="charuco_detector/doc/resource/camera_calibration_execution.png" alt="camera_calibration_execution" style="width: 80%;"/></center>
+<center><img src="doc/resource/camera_calibration_execution.png" alt="camera_calibration_execution" style="width: 80%;"/></center>
 
 Before press `Start Execution`, parameter `pic_num` decide how many calibration picture you will take, 
 parameter `square_size`, `marker_size` , `col_count` , `row_count` means the spec of charuco marker board we use.
@@ -106,7 +106,7 @@ Then, press `Load Behavior` on the top, and select `Automatic Hand Eye Calibrati
 
 After this, you can press `Runtime Control` on the top, execution window will show:
 
-<center><img src="charuco_detector/doc/resource/auto_hand_eye_calib_execute.png" alt="auto_hand_eye_calib_execute" style="width: 80%;"/></center>
+<center><img src="doc/resource/auto_hand_eye_calib_execute.png" alt="auto_hand_eye_calib_execute" style="width: 80%;"/></center>
 
 Before press `Start Execution`, parameter `eye_in_hand_mode` decide which calibration mode you want to use, 
 parameter `customize_file` , decide whether you want to change save file name or not,
