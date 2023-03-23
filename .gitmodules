@@ -1,0 +1,3 @@
+[submodule "charuco_detector"]
+	path = charuco_detector
+	url = https://github.com/errrr0501/charuco_detector.git
