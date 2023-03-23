@@ -26,7 +26,7 @@ sudo apt install ros-$ROS_DISTRO--moveit
 git clone https://github.com/FlexBE/flexbe_app.git
 
 # Clone this hand-eye-cliabtion package to your workspace
-git clone https://github.com/errrr0501/hand-eye-calibration.git
+git clone --recurse-submodules https://github.com/errrr0501/hand-eye-calibration.git
 
 # build the workspace
 catkiin_make
