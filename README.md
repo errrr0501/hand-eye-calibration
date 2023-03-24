@@ -1,7 +1,6 @@
 # Universal Automatical Hand-Eye-Calibration
 This Hand-eye_calibration method include [FlexBE](http://philserver.bplaced.net/fbe/download.php), and [MoveIt!](https://moveit.ros.org/), which make this whole framework easier for beginner to do hand-eye-calibration, also implement on different platform more faster.
 
-https://github.com/errrr0501/ubuntu20.04_docker
 ## Acknowledgment
 This charuco marker detection is forked from the [charuco_detector](https://github.com/carlosmccosta/charuco_detector).
 
